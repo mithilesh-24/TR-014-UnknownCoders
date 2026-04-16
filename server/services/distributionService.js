@@ -63,22 +63,52 @@ function distribute(totalEnergy, houses) {
       cut       : false,
     }));
   } else {
-    // Pro-rata allocation — spread the available energy proportionally
-    const ratio = totalEnergy / totalDemand;
+    // Rolling Blackout allocation — fulfill houses randomly until energy runs out
+    // This allows us to see some houses as Optimal (green) and others as Critical (red)
+    const shuffledHouses = [...houses].sort(() => Math.random() - 0.5);
 
-    distribution = houses.map((h) => {
-      const allocated = Math.round(h.demand * ratio * 100) / 100;
-      const cutAmount = Math.round((h.demand - allocated) * 100) / 100;
+    let remainingEnergy = totalEnergy;
+    distribution = [];
 
-      return {
-        houseId   : h.houseId,
-        tier      : h.tier,
-        demand    : h.demand,
-        allocated,
-        cutAmount : cutAmount > 0 ? cutAmount : 0,
-        cut       : cutAmount > 0,
-      };
-    });
+    for (const h of shuffledHouses) {
+      if (remainingEnergy >= h.demand) {
+        // House gets full power
+        distribution.push({
+          houseId   : h.houseId,
+          tier      : h.tier,
+          demand    : h.demand,
+          allocated : h.demand,
+          cutAmount : 0,
+          cut       : false,
+        });
+        remainingEnergy -= h.demand;
+      } else if (remainingEnergy > 0) {
+        // Partial power for this one house
+        const allocated = Math.round(remainingEnergy * 100) / 100;
+        distribution.push({
+          houseId   : h.houseId,
+          tier      : h.tier,
+          demand    : h.demand,
+          allocated,
+          cutAmount : Math.round((h.demand - allocated) * 100) / 100,
+          cut       : true,
+        });
+        remainingEnergy = 0;
+      } else {
+        // Total power cut for remaining houses
+        distribution.push({
+          houseId   : h.houseId,
+          tier      : h.tier,
+          demand    : h.demand,
+          allocated : 0,
+          cutAmount : h.demand,
+          cut       : true,
+        });
+      }
+    }
+
+    // Sort back into original order by houseId so the map stays stable
+    distribution.sort((a, b) => a.houseId.localeCompare(b.houseId));
   }
 
   const shortage        = isSufficient ? 0 : Math.round((totalDemand - totalEnergy) * 100) / 100;

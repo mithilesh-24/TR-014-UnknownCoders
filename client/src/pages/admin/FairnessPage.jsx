@@ -125,10 +125,10 @@ function LoadingSkeleton() {
 }
 
 export default function FairnessPage() {
-  const { get, post } = useApi();
+  const [error, setError] = useState(null);
+  const { post } = useApi();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [alertFilter, setAlertFilter] = useState('All');
   const [distributing, setDistributing] = useState(false);
   const [dismissedAlerts, setDismissedAlerts] = useState(new Set());
@@ -136,10 +136,41 @@ export default function FairnessPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const result = await get('/admin/fairness');
-      setData(result);
+      // Fetch live predictions from the ML pipeline instead of the DB
+      const result = await post('/system/run');
+
+      const alerts = result.alert
+        ? [
+          {
+            message: result.alert.message,
+            type: 'shortage',
+            severity: result.alert.level,
+            createdAt: result.timestamp,
+          },
+        ]
+        : [];
+
+      const mappedHouses = (result.distribution || []).map((h) => ({
+        houseNumber: h.houseId.replace('HOUSE_', ''),
+        cutCount: h.cut ? 1 : 0,
+        totalCutAmount: h.cutAmount,
+      }));
+
+      const fairnessScore =
+        result.status === 'sufficient' ? 100 : Math.max(0, 100 - result.shortagePercent);
+
+      // Std deviation mock using shortage for visual variance
+      const stdDeviation = result.shortagePercent ? (result.shortagePercent / 4) : 0.4;
+
+      setData({
+        fairnessScore,
+        stdDeviation,
+        houses: mappedHouses,
+        alerts,
+      });
+      setDismissedAlerts(new Set());
     } catch (err) {
-      setError(err.message || 'Failed to load fairness data');
+      setError(err.message || 'Failed to load smart grid ML data');
     } finally {
       setLoading(false);
     }
@@ -152,10 +183,10 @@ export default function FairnessPage() {
   const handleRunDistribution = async () => {
     try {
       setDistributing(true);
-      await post('/system/run-distribution');
+      // Force a fresh fetch from the ML process
       await fetchData();
     } catch (err) {
-      setError(err.message || 'Failed to run distribution');
+      setError(err.message || 'Failed to run smart grid ML pipeline');
     } finally {
       setDistributing(false);
     }

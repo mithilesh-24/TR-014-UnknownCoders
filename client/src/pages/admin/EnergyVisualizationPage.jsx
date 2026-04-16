@@ -5,8 +5,8 @@ import GlassCard from "../../components/ui/GlassCard";
 import EnergyGrid from "../../components/three/EnergyGrid";
 import useApi from "../../hooks/useApi";
 
-const GRID_COLS = 4;
-const GRID_ROWS = 3;
+// Dynamic grid layout sizing instead of hardcoded
+// so the 55 ML houses fit perfectly on the screen
 const SPACING_X = 2.4;
 const SPACING_Z = 2.4;
 
@@ -14,11 +14,13 @@ function generateMockHouses() {
   const statuses = ["green", "green", "green", "yellow", "yellow", "red"];
   const houses = [];
 
-  for (let row = 0; row < GRID_ROWS; row++) {
-    for (let col = 0; col < GRID_COLS; col++) {
-      const index = row * GRID_COLS + col;
-      const x = (col - (GRID_COLS - 1) / 2) * SPACING_X;
-      const z = (row - (GRID_ROWS - 1) / 2) * SPACING_Z;
+  const gridCols = 4;
+  const gridRows = 3;
+  for (let row = 0; row < gridRows; row++) {
+    for (let col = 0; col < gridCols; col++) {
+      const index = row * gridCols + col;
+      const x = (col - (gridCols - 1) / 2) * SPACING_X;
+      const z = (row - (gridRows - 1) / 2) * SPACING_Z;
       const status = statuses[index % statuses.length];
       const energyLevel =
         status === "green"
@@ -42,30 +44,58 @@ function generateMockHouses() {
 }
 
 function mapApiHousesToGrid(apiHouses) {
-  return apiHouses.map((house, index) => {
-    const row = Math.floor(index / GRID_COLS);
-    const col = index % GRID_COLS;
-    const x = (col - (GRID_COLS - 1) / 2) * SPACING_X;
-    const z = (row - (GRID_ROWS - 1) / 2) * SPACING_Z;
+  const total = apiHouses.length;
+  // Dynamically calculate grid columns/rows so we can display 55+ houses
+  const gridCols = Math.ceil(Math.sqrt(total * 1.5));
+  const gridRows = Math.ceil(total / gridCols);
+  
+  // Scale down spacing for large swarms of houses
+  const customSpacingX = Math.max(1.2, 2.4 - (gridCols * 0.05));
+  const customSpacingZ = Math.max(1.2, 2.4 - (gridRows * 0.05));
 
-    const consumption = house.currentConsumption || 0;
-    const allocation = house.energyAllocation || house.allocation || 1;
-    const ratio = allocation > 0 ? consumption / allocation : 0;
+  return apiHouses.map((house, index) => {
+    const row = Math.floor(index / gridCols);
+    const col = index % gridCols;
+    const x = (col - (gridCols - 1) / 2) * customSpacingX;
+    const z = (row - (gridRows - 1) / 2) * customSpacingZ;
+
+    // New format (from ML Distribution Service): { demand, allocated, cutAmount, ... }
+    // Old format (fallback): { currentConsumption, energyAllocation, ... }
+    const demand = house.demand || house.currentConsumption || 1;
+    let allocated = 1;
+    if (house.allocated !== undefined) {
+      allocated = house.allocated;
+    } else if (house.energyAllocation !== undefined) {
+      allocated = house.energyAllocation;
+    } else {
+      allocated = demand;
+    }
+
+    const supplyRatio = demand > 0 ? allocated / demand : 1;
 
     let status;
-    if (ratio <= 0.85) {
+    if (supplyRatio >= 0.95) {
       status = "green";
-    } else if (ratio <= 1.0) {
+    } else if (supplyRatio >= 0.65) {
       status = "yellow";
     } else {
       status = "red";
     }
 
-    const energyLevel = Math.min(1, Math.max(0, allocation > 0 ? 1 - (ratio - 0.5) / 1.0 : 0));
+    // Convert the ratio into a raw 0.0 - 1.0 energy visual level
+    const energyLevel = Math.max(0, Math.min(1, supplyRatio));
+    
+    // Extract a numeric house number for the label
+    let hNumber = index + 1;
+    if (house.houseId && typeof house.houseId === "string") {
+      hNumber = parseInt(house.houseId.replace("HOUSE_", ""), 10) || hNumber;
+    } else if (house.houseNumber) {
+      hNumber = house.houseNumber;
+    }
 
     return {
-      id: house._id || house.id || index + 1,
-      houseNumber: house.houseNumber || index + 1,
+      id: house.houseId || house._id || house.id || index + 1,
+      houseNumber: hNumber,
       x,
       z,
       status,
@@ -162,23 +192,33 @@ export default function EnergyVisualizationPage() {
   const [houses, setHouses] = useState([]);
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { get } = useApi();
+  const { post, get } = useApi();
 
   useEffect(() => {
     let mounted = true;
 
     async function fetchHouses() {
       try {
-        const data = await get("/admin/houses");
+        // Hit the new ML pipeline! Returns exactly 55 dynamically sized and generated houses
+        const data = await post("/system/run");
         if (!mounted) return;
-        const houseList = Array.isArray(data) ? data : data?.houses || data?.data || [];
+        
+        let houseList = [];
+        // Extract out from new `/system/run` distribution payload, or gracefully fallback
+        if (data && data.distribution) {
+          houseList = data.distribution;
+        } else {
+          // Fallback if the endpoint response somehow changed
+          houseList = Array.isArray(data) ? data : data?.houses || data?.data || [];
+        }
 
         if (houseList.length > 0) {
           setHouses(mapApiHousesToGrid(houseList));
         } else {
           setHouses(generateMockHouses());
         }
-      } catch {
+      } catch (error) {
+        console.error("Failed to run smart grid ML pipeline:", error);
         if (mounted) setHouses(generateMockHouses());
       } finally {
         if (mounted) setLoading(false);

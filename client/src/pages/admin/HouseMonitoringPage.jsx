@@ -242,7 +242,7 @@ function HouseDetailModal({ house, onClose }) {
 }
 
 export default function HouseMonitoringPage() {
-  const { get } = useApi();
+  const { get, post } = useApi();
   const [houses, setHouses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -255,10 +255,36 @@ export default function HouseMonitoringPage() {
     const fetchHouses = async () => {
       try {
         setLoading(true);
+        // Step 1. Get base db houses for ownership and static solar metadata
         const result = await get('/admin/houses', { period });
-        setHouses(result.houses ?? []);
+        const dbHouses = result.houses ?? [];
+
+        // Step 2. Get real-time predictions and distribution from ML pipeline
+        const mlResult = await post('/system/run').catch(e => null);
+
+        if (mlResult && mlResult.distribution) {
+          const merged = dbHouses.map(h => {
+            // ML outputs houseId like 'HOUSE_001', db has houseNumber '1'
+            const targetId = `HOUSE_${String(h.houseNumber).padStart(3, '0')}`;
+            const mlHouse = mlResult.distribution.find(d => d.houseId === targetId);
+
+            if (mlHouse) {
+              return {
+                ...h,
+                // Override consumption with actual ML allocation from physics/demand simulation
+                latestConsumption: mlHouse.allocated,
+                // Increment cut count if physics simulation triggered a blackout for this house
+                cutCount: mlHouse.cut ? (h.cutCount || 0) + 1 : h.cutCount,
+              };
+            }
+            return h;
+          });
+          setHouses(merged);
+        } else {
+          setHouses(dbHouses);
+        }
       } catch (err) {
-        setError(err.message || 'Failed to load houses');
+        setError(err.message || 'Failed to load houses or ML data');
       } finally {
         setLoading(false);
       }

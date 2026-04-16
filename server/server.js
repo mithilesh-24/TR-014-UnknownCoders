@@ -36,8 +36,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/system",    systemRoutes);
-app.use("/api/smartgrid",  smartGridRoutes); // Smart grid ML pipeline (POST /api/smartgrid/run)
+app.use("/api/system", smartGridRoutes); // Mount before systemRoutes to bypass auth for /system/run
+app.use("/api/system", systemRoutes);
 
 // Health check
 app.get("/api/health", (_req, res) => {

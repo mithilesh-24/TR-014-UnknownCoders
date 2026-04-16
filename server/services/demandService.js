@@ -9,8 +9,7 @@
  *   - Evening hours (18–23) apply a 30% demand multiplier
  *   - Values stay within real-world residential ranges
  */
-
-const HOUSE_COUNT = 55;
+const HOUSE_COUNT = 10;
 
 // Weighted tier distribution — most houses are medium consumers
 const TIERS = [

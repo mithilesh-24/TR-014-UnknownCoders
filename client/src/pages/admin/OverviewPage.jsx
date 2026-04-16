@@ -59,11 +59,61 @@ export default function OverviewPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const result = await get('/admin/overview');
-      setData(result);
+      // Fetch live predictions from the ML pipeline instead of the generic mocked endpoint
+      const result = await post('/system/run');
+      
+      // Transform single ML prediction point into the dashboard's expected shapes
+      const generation = result.totalEnergy;
+      const consumption = result.totalDemand;
+      const supplyDemandRatio = consumption > 0 ? generation / consumption : 1;
+
+      // Create a 24-hour visualization based on the current ML state
+      const nowHour = new Date().getHours();
+      const hourlyGeneration = [];
+      const hourlyConsumption = [];
+      
+      for (let i = 23; i >= 0; i--) {
+        const h = (nowHour - i + 24) % 24;
+        
+        // Simple synthetic curves anchored to today's ML output
+        let solarPart = 0;
+        if (h > 6 && h < 19) {
+          const dist = Math.abs(12 - h);
+          solarPart = (generation * 0.7) * (1 - dist / 6);
+        }
+        const windPart = (generation * 0.3) * (0.5 + Math.random() * 0.5);
+        
+        // Demand peaks in evening
+        let dMult = 1;
+        if (h >= 18 && h <= 23) dMult = 1.5;
+        else if (h >= 2 && h <= 5) dMult = 0.5;
+        
+        hourlyGeneration.push({
+          hour: `${h}:00`,
+          solar: Math.round(Math.max(0, solarPart)),
+          wind: Math.round(windPart),
+          total: Math.round(Math.max(0, solarPart) + windPart)
+        });
+        
+        hourlyConsumption.push({
+          hour: `${h}:00`,
+          consumption: Math.round(consumption * dMult)
+        });
+      }
+
+      setData({
+        totalGeneration: Math.round(generation),
+        totalConsumption: Math.round(consumption),
+        supplyDemandRatio: supplyDemandRatio.toFixed(2),
+        batteryLevel: Math.round(result.status === 'sufficient' ? 85 : 20),
+        houseCount: result.distribution ? result.distribution.length : 55,
+        activeAlerts: result.alert ? 1 : 0,
+        hourlyGeneration,
+        hourlyConsumption
+      });
       setError(null);
     } catch (err) {
-      setError(err.message || 'Failed to load overview data');
+      setError(err.message || 'Failed to load realtime ML overview data');
     } finally {
       setLoading(false);
     }
@@ -84,9 +134,9 @@ export default function OverviewPage() {
     try {
       setSimulating(true);
       setSimResult(null);
-      console.log('[OverviewPage] Running smart grid simulation...');
-      const result = await post('/smartgrid/run');
-      console.log('[OverviewPage] Simulation result:', result);
+      console.log('[OverviewPage] Running ML pipeline simulation...');
+      const result = await post('/system/run'); // Fixed endpoint from /smartgrid to /system
+      console.log('[OverviewPage] ML pipeline result:', result);
       setSimResult(result);
       await fetchData();
     } catch (err) {
