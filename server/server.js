@@ -37,7 +37,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/system",    systemRoutes);
-app.use("/api/system",    smartGridRoutes); // NEW — smart grid ML pipeline (POST /system/run)
+app.use("/api/smartgrid",  smartGridRoutes); // Smart grid ML pipeline (POST /api/smartgrid/run)
 
 // Health check
 app.get("/api/health", (_req, res) => {

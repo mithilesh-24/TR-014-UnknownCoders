@@ -8,6 +8,8 @@ import {
   HiOutlineExclamationTriangle,
   HiOutlineArrowTrendingUp,
   HiOutlineArrowTrendingDown,
+  HiOutlineArrowPath,
+  HiOutlinePlay,
 } from 'react-icons/hi2';
 import { RiSunLine, RiWindyLine } from 'react-icons/ri';
 import GlassCard from '../../components/ui/GlassCard';
@@ -46,25 +48,53 @@ function LoadingSkeleton() {
 }
 
 export default function OverviewPage() {
-  const { get } = useApi();
+  const { get, post } = useApi();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [simulating, setSimulating] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [simResult, setSimResult] = useState(null);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const result = await get('/admin/overview');
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err.message || 'Failed to load overview data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const result = await get('/admin/overview');
-        setData(result);
-      } catch (err) {
-        setError(err.message || 'Failed to load overview data');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    console.log('[OverviewPage] Refreshing data...');
+    await fetchData();
+    setRefreshing(false);
+  };
+
+  const handleRunSimulation = async () => {
+    try {
+      setSimulating(true);
+      setSimResult(null);
+      console.log('[OverviewPage] Running smart grid simulation...');
+      const result = await post('/smartgrid/run');
+      console.log('[OverviewPage] Simulation result:', result);
+      setSimResult(result);
+      await fetchData();
+    } catch (err) {
+      setError(err.message || 'Simulation failed');
+    } finally {
+      setSimulating(false);
+    }
+  };
 
   if (loading) return <LoadingSkeleton />;
 
@@ -106,10 +136,66 @@ export default function OverviewPage() {
     <div className="page-container">
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="page-inner">
         {/* Header */}
-        <motion.div variants={itemVariants} className="page-header">
-          <h1 className="page-title">Admin Overview</h1>
-          <p className="page-subtitle">Real-time energy monitoring dashboard &middot; {data?.houseCount ?? 0} houses connected</p>
+        <motion.div variants={itemVariants} className="page-header" style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <h1 className="page-title">Admin Overview</h1>
+            <p className="page-subtitle">Real-time energy monitoring dashboard &middot; {data?.houseCount ?? 0} houses connected</p>
+          </div>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleRefresh}
+              disabled={refreshing}
+              style={{
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                borderRadius: "0.75rem", padding: "0.625rem 1rem",
+                fontSize: "0.875rem", fontWeight: "500", color: "#cbd5e1",
+                backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                cursor: refreshing ? "not-allowed" : "pointer", opacity: refreshing ? 0.5 : 1,
+                transition: "all 0.2s",
+              }}
+            >
+              <HiOutlineArrowPath style={{ fontSize: "1rem", animation: refreshing ? "spin 1s linear infinite" : "none" }} />
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleRunSimulation}
+              disabled={simulating}
+              style={{
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                borderRadius: "0.75rem", backgroundColor: "var(--accent)",
+                padding: "0.625rem 1.25rem", fontSize: "0.875rem", fontWeight: "500",
+                color: "#fff", boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.2)",
+                transition: "all 0.2s", opacity: simulating ? 0.5 : 1,
+                cursor: simulating ? "not-allowed" : "pointer", border: "none",
+              }}
+            >
+              <HiOutlinePlay style={{ fontSize: "1rem", animation: simulating ? "spin 1s linear infinite" : "none" }} />
+              {simulating ? 'Running...' : 'Run Simulation'}
+            </motion.button>
+          </div>
         </motion.div>
+
+        {/* Simulation Result */}
+        {simResult && (
+          <motion.div variants={itemVariants} style={{ marginBottom: "1rem" }}>
+            <div style={{
+              borderRadius: "0.75rem", padding: "1rem",
+              backgroundColor: simResult.status === 'sufficient' ? "rgba(16, 185, 129, 0.05)" : "rgba(239, 68, 68, 0.05)",
+              border: `1px solid ${simResult.status === 'sufficient' ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.15)"}`,
+            }}>
+              <p style={{ fontSize: "0.875rem", color: simResult.status === 'sufficient' ? "#34d399" : "#fca5a5", fontWeight: "500" }}>
+                Simulation Complete: {simResult.totalEnergy?.toFixed(2)} kWh generated, {simResult.totalDemand?.toFixed(2)} kWh demanded
+                {simResult.status === 'shortage' && ` (Shortage: ${simResult.shortage?.toFixed(2)} kWh)`}
+                {simResult.status === 'sufficient' && ` (Surplus: ${simResult.surplus?.toFixed(2)} kWh)`}
+                {' '}| Pipeline: {simResult.pipelineMs}ms | ML: {simResult.prediction?.source}
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Stat Cards */}
         <motion.div variants={containerVariants} className="grid-metrics">

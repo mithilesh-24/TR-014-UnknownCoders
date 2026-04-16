@@ -74,9 +74,11 @@ function getMockWeather() {
 async function getWeather() {
   // No API key → skip network call, return mock immediately
   if (!API_KEY || API_KEY === "your_key_here") {
-    console.log("[Weather] No API key — using mock weather data");
+    console.log("[Weather] No API key configured — using mock weather data");
     return getMockWeather();
   }
+
+  console.log(`[Weather] Fetching real weather for city: ${CITY}`);
 
   try {
     const response = await axios.get(BASE_URL, {
@@ -96,7 +98,7 @@ async function getWeather() {
       radiation    = Math.round(factor * 1000 * (1 - cloudFraction * 0.75) * 10) / 10;
     }
 
-    return {
+    const result = {
       temperature : Math.round(data.main.temp * 10)       / 10,
       wind_speed  : Math.round(data.wind.speed * 10)      / 10,
       radiation,
@@ -107,6 +109,8 @@ async function getWeather() {
       source      : "api",
       city        : data.name,
     };
+    console.log("[Weather] API response:", { temp: result.temperature, wind: result.wind_speed, city: result.city });
+    return result;
   } catch (err) {
     console.warn("[Weather] API call failed, using mock data:", err.message);
     return getMockWeather();

@@ -15,6 +15,7 @@ import {
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
   HiOutlineOfficeBuilding,
+  HiOutlineCog,
 } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 
@@ -24,6 +25,7 @@ const adminNavItems = [
   { label: "Predictions", icon: HiOutlineTrendingUp, path: "/admin/predictions" },
   { label: "3D View", icon: HiOutlineCube, path: "/admin/3d-view" },
   { label: "Fairness & Alerts", icon: HiOutlineShieldCheck, path: "/admin/fairness" },
+  { label: "Settings", icon: HiOutlineCog, path: "/admin/settings" },
 ];
 
 const userNavItems = [

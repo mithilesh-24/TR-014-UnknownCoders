@@ -56,7 +56,7 @@ function formatHour(hour) {
 }
 
 export default function InsightsPage() {
-  const api = useApi();
+  const { get } = useApi();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -67,7 +67,7 @@ export default function InsightsPage() {
     async function fetchInsights() {
       try {
         setLoading(true);
-        const res = await api.get("/user/insights");
+        const res = await get("/user/insights");
         if (mounted) setData(res);
       } catch (err) {
         if (mounted) setError(err.message);
@@ -78,7 +78,7 @@ export default function InsightsPage() {
 
     fetchInsights();
     return () => { mounted = false; };
-  }, [api]);
+  }, []);
 
   if (loading) return <LoadingSkeleton />;
 

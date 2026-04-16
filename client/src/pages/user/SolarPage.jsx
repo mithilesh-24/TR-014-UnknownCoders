@@ -121,7 +121,7 @@ function NoSolarMessage() {
 }
 
 export default function SolarPage() {
-  const api = useApi();
+  const { get } = useApi();
   const [data, setData] = useState(null);
   const [hasSolar, setHasSolar] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -133,8 +133,7 @@ export default function SolarPage() {
     async function fetchSolar() {
       try {
         setLoading(true);
-        // First check if user has solar from dashboard
-        const dashboard = await api.get("/user/dashboard");
+        const dashboard = await get("/user/dashboard");
         if (!mounted) return;
 
         if (!dashboard.house?.hasSolar) {
@@ -144,7 +143,7 @@ export default function SolarPage() {
         }
 
         setHasSolar(true);
-        const solarData = await api.get("/user/solar");
+        const solarData = await get("/user/solar");
         if (mounted) setData(solarData);
       } catch (err) {
         if (mounted) setError(err.message);
@@ -155,7 +154,7 @@ export default function SolarPage() {
 
     fetchSolar();
     return () => { mounted = false; };
-  }, [api]);
+  }, []);
 
   if (loading) return <LoadingSkeleton />;
 

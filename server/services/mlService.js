@@ -63,6 +63,8 @@ async function predict(features) {
     wind_speed : features.wind_speed,
   };
 
+  console.log(`[ML] Calling ${ML_URL}/predict with:`, payload);
+
   try {
     const response = await axios.post(`${ML_URL}/predict`, payload, {
       timeout: 8000,
@@ -70,6 +72,7 @@ async function predict(features) {
     });
 
     const { temperature, energy } = response.data;
+    console.log(`[ML] Model response: temp=${temperature}, energy=${energy}`);
 
     return {
       temperature : Math.round(temperature * 100) / 100,

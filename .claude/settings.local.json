@@ -11,7 +11,9 @@
       "Bash(node -e \"console.log\\(require\\('mongoose/package.json'\\).version\\)\")",
       "Bash(curl:*)",
       "Bash(node -e ':*)",
-      "Bash(taskkill //F //IM node.exe)"
+      "Bash(taskkill //F //IM node.exe)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist)"
     ]
   }
 }

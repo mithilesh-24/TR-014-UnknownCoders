@@ -5,6 +5,7 @@ const Distribution = require("../models/Distribution");
 const Battery = require("../models/Battery");
 const Alert = require("../models/Alert");
 const Forecast = require("../models/Forecast");
+const Settings = require("../models/Settings");
 const { calculateFairnessScore, generateMockGeneration } = require("../utils/energyCalculations");
 
 exports.getOverview = async (req, res) => {
@@ -113,7 +114,7 @@ exports.getHouses = async (req, res) => {
 
     const housesWithConsumption = await Promise.all(
       houses.map(async (house) => {
-        const latestConsumption = await Consumption.findOne({ houseId: house._id })
+        const latestConsumptionDoc = await Consumption.findOne({ houseId: house._id })
           .sort({ timestamp: -1 })
           .lean();
 
@@ -122,11 +123,14 @@ exports.getHouses = async (req, res) => {
           { $group: { _id: null, total: { $sum: "$energyUsed" } } },
         ]);
 
+        const cutCount = await Distribution.countDocuments({ houseId: house._id, cutFlag: true });
+
         return {
           ...house,
           user: house.userId || null,
-          latestConsumption: latestConsumption || null,
+          latestConsumption: latestConsumptionDoc ? Math.round(latestConsumptionDoc.energyUsed * 100) / 100 : null,
           totalConsumption: totalConsumption.length > 0 ? Math.round(totalConsumption[0].total * 100) / 100 : 0,
+          cutCount,
         };
       })
     );
@@ -202,7 +206,7 @@ exports.getPrediction = async (req, res) => {
       forecasts = await Forecast.insertMany(docs);
     }
 
-    return res.json(forecasts);
+    return res.json({ forecasts });
   } catch (err) {
     console.error("[Admin] Prediction error:", err.message);
     return res.status(500).json({ message: "Server error fetching predictions" });
@@ -241,13 +245,63 @@ exports.getFairness = async (req, res) => {
       .limit(20)
       .lean();
 
+    // Derive a 0-100 fairness score: lower stdDeviation = higher score
+    const maxReasonableStd = 5;
+    const fairnessScore = Math.max(0, Math.round((1 - Math.min(stdDeviation / maxReasonableStd, 1)) * 100));
+
     return res.json({
       houses: fairnessData,
+      fairnessScore,
       stdDeviation: Math.round(stdDeviation * 1000) / 1000,
-      activeAlerts,
+      alerts: activeAlerts,
     });
   } catch (err) {
     console.error("[Admin] Fairness error:", err.message);
     return res.status(500).json({ message: "Server error calculating fairness" });
+  }
+};
+
+exports.getSettings = async (req, res) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({});
+    }
+    console.log("[Admin] Settings loaded");
+    return res.json(settings);
+  } catch (err) {
+    console.error("[Admin] Settings load error:", err.message);
+    return res.status(500).json({ message: "Server error loading settings" });
+  }
+};
+
+exports.updateSettings = async (req, res) => {
+  try {
+    const allowedFields = [
+      "gridName", "location", "maxHouses", "batteryCapacity",
+      "alertThresholdCritical", "alertThresholdWarning",
+      "mlServiceUrl", "weatherCity",
+    ];
+    const updates = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+    updates.updatedAt = new Date();
+
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create(updates);
+    } else {
+      Object.assign(settings, updates);
+      await settings.save();
+    }
+
+    console.log("[Admin] Settings updated:", updates);
+    return res.json({ message: "Settings updated successfully", settings });
+  } catch (err) {
+    console.error("[Admin] Settings update error:", err.message);
+    return res.status(500).json({ message: "Server error updating settings" });
   }
 };

@@ -11,7 +11,12 @@ const useApi = () => {
     return response.data;
   };
 
-  return { get, post };
+  const put = async (url, data = {}) => {
+    const response = await api.put(url, data);
+    return response.data;
+  };
+
+  return { get, post, put };
 };
 
 export default useApi;

@@ -112,7 +112,7 @@ function ConnectingLine({ index }) {
 }
 
 export default function ForecastPage() {
-  const api = useApi();
+  const { get } = useApi();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -123,7 +123,7 @@ export default function ForecastPage() {
     async function fetchForecast() {
       try {
         setLoading(true);
-        const res = await api.get("/user/forecast");
+        const res = await get("/user/forecast");
         if (mounted) setData(res);
       } catch (err) {
         if (mounted) setError(err.message);
@@ -134,7 +134,7 @@ export default function ForecastPage() {
 
     fetchForecast();
     return () => { mounted = false; };
-  }, [api]);
+  }, []);
 
   if (loading) return <LoadingSkeleton />;
 

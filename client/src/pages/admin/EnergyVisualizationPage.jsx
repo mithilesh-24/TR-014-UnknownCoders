@@ -162,28 +162,32 @@ export default function EnergyVisualizationPage() {
   const [houses, setHouses] = useState([]);
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const api = useApi();
-
-  const fetchHouses = useCallback(async () => {
-    try {
-      const data = await api.get("/admin/houses");
-      const houseList = Array.isArray(data) ? data : data?.houses || data?.data || [];
-
-      if (houseList.length > 0) {
-        setHouses(mapApiHousesToGrid(houseList));
-      } else {
-        setHouses(generateMockHouses());
-      }
-    } catch {
-      setHouses(generateMockHouses());
-    } finally {
-      setLoading(false);
-    }
-  }, [api]);
+  const { get } = useApi();
 
   useEffect(() => {
+    let mounted = true;
+
+    async function fetchHouses() {
+      try {
+        const data = await get("/admin/houses");
+        if (!mounted) return;
+        const houseList = Array.isArray(data) ? data : data?.houses || data?.data || [];
+
+        if (houseList.length > 0) {
+          setHouses(mapApiHousesToGrid(houseList));
+        } else {
+          setHouses(generateMockHouses());
+        }
+      } catch {
+        if (mounted) setHouses(generateMockHouses());
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
     fetchHouses();
-  }, [fetchHouses]);
+    return () => { mounted = false; };
+  }, []);
 
   const handleHouseClick = useCallback((house) => {
     setSelectedHouse((prev) => (prev?.id === house.id ? null : house));

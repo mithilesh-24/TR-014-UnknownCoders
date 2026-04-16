@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { HiHome, HiBolt, HiClock, HiChartBar } from "react-icons/hi2";
+import { HiHome, HiBolt, HiClock, HiChartBar, HiArrowPath } from "react-icons/hi2";
 import GlassCard from "../../components/ui/GlassCard";
 import AnimatedCounter from "../../components/ui/AnimatedCounter";
 import StatusBadge from "../../components/ui/StatusBadge";
@@ -38,29 +38,35 @@ function LoadingSkeleton() {
 }
 
 export default function UserHomePage() {
-  const api = useApi();
+  const { get } = useApi();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true);
+      const res = await get("/user/dashboard");
+      setData(res);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-
-    async function fetchDashboard() {
-      try {
-        setLoading(true);
-        const res = await api.get("/user/dashboard");
-        if (mounted) setData(res);
-      } catch (err) {
-        if (mounted) setError(err.message);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
     fetchDashboard();
-    return () => { mounted = false; };
-  }, [api]);
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    console.log("[UserHomePage] Refreshing dashboard...");
+    await fetchDashboard();
+    setRefreshing(false);
+  };
 
   if (loading) return <LoadingSkeleton />;
 
@@ -109,7 +115,25 @@ export default function UserHomePage() {
               {house?.address || "Address not available"}
             </p>
           </div>
-          <StatusBadge status={status || "ok"} label={statusLabels[status] || "Supply Stable"} size="lg" />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleRefresh}
+              disabled={refreshing}
+              style={{
+                display: "flex", alignItems: "center", gap: "0.5rem",
+                borderRadius: "0.75rem", padding: "0.5rem 1rem",
+                fontSize: "0.75rem", fontWeight: "500", color: "#cbd5e1",
+                backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                cursor: refreshing ? "not-allowed" : "pointer", opacity: refreshing ? 0.5 : 1,
+              }}
+            >
+              <HiArrowPath style={{ fontSize: "0.875rem", animation: refreshing ? "spin 1s linear infinite" : "none" }} />
+              Refresh
+            </motion.button>
+            <StatusBadge status={status || "ok"} label={statusLabels[status] || "Supply Stable"} size="lg" />
+          </div>
         </motion.div>
 
         {/* Stat Cards */}
