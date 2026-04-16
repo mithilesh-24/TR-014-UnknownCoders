@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm init:*)",
+      "Bash(echo \"Backend JS files: $\\(find \"D:/Project/Tensor/server\" -name \"*.js\" -not -path \"*/node_modules/*\")",
+      "Bash(node server.js)",
+      "Bash(npx vite:*)",
+      "Bash(node -e \"console.log\\(require\\('mongoose/package.json'\\).version\\)\")",
+      "Bash(curl:*)",
+      "Bash(node -e ':*)",
+      "Bash(taskkill //F //IM node.exe)"
+    ]
+  }
+}
