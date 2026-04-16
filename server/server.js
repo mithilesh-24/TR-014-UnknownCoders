@@ -14,6 +14,7 @@ const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const systemRoutes = require("./routes/system");
+const smartGridRoutes = require("./routes/smartGrid");
 
 // ---------------------------------------------------------------------------
 // Express app setup
@@ -35,7 +36,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/system", systemRoutes);
+app.use("/api/system",    systemRoutes);
+app.use("/api/system",    smartGridRoutes); // NEW — smart grid ML pipeline (POST /system/run)
 
 // Health check
 app.get("/api/health", (_req, res) => {
@@ -66,3 +68,4 @@ mongoose
   });
 
 module.exports = app;
+
