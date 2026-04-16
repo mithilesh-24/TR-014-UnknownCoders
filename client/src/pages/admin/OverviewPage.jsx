@@ -19,10 +19,7 @@ import useApi from '../../hooks/useApi';
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const itemVariants = {
@@ -32,22 +29,18 @@ const itemVariants = {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6">
-      <div className="mb-8 h-10 w-64 animate-pulse rounded-xl bg-white/5" />
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" />
+      <div className="grid-metrics">
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="h-36 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60"
-            style={{ animationDelay: `${i * 100}ms` }}
-          />
+          <div key={i} className="skeleton-pulse skeleton-metric" style={{ animationDelay: `${i * 100}ms` }} />
         ))}
       </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="h-80 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
-        <div className="h-80 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
+      <div className="grid-charts mt-6">
+        <div className="skeleton-pulse skeleton-chart" />
+        <div className="skeleton-pulse skeleton-chart" />
       </div>
-      <div className="mt-6 h-40 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
+      <div className="skeleton-pulse skeleton-chart-full" />
     </div>
   );
 }
@@ -77,11 +70,11 @@ export default function OverviewPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f] p-6">
-        <GlassCard className="max-w-md p-8 text-center">
-          <HiOutlineExclamationTriangle className="mx-auto mb-4 h-12 w-12 text-red-400" />
-          <h2 className="mb-2 text-xl font-semibold text-slate-200">Failed to Load</h2>
-          <p className="text-sm text-slate-400">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-6 text-center" style={{ maxWidth: '28rem' }}>
+          <HiOutlineExclamationTriangle style={{ width: '3rem', height: '3rem', color: '#f87171', margin: '0 auto 1rem' }} />
+          <h2 className="page-title mb-2">Failed to Load</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
@@ -91,42 +84,10 @@ export default function OverviewPage() {
   const ratioTrend = supplyRatio >= 1 ? 'up' : 'down';
 
   const statCards = [
-    {
-      title: 'Total Generation',
-      value: data?.totalGeneration ?? 0,
-      suffix: ' kWh',
-      icon: HiOutlineBolt,
-      iconColor: 'text-amber-400',
-      iconBg: 'bg-amber-500/10',
-      trend: 'up',
-    },
-    {
-      title: 'Total Consumption',
-      value: data?.totalConsumption ?? 0,
-      suffix: ' kWh',
-      icon: HiOutlineBoltSlash,
-      iconColor: 'text-indigo-400',
-      iconBg: 'bg-indigo-500/10',
-      trend: 'down',
-    },
-    {
-      title: 'Supply/Demand Ratio',
-      value: supplyRatio,
-      suffix: '',
-      icon: HiOutlineScale,
-      iconColor: supplyRatio >= 1 ? 'text-emerald-400' : 'text-red-400',
-      iconBg: supplyRatio >= 1 ? 'bg-emerald-500/10' : 'bg-red-500/10',
-      trend: ratioTrend,
-    },
-    {
-      title: 'Battery Level',
-      value: data?.batteryLevel ?? 0,
-      suffix: '%',
-      icon: HiOutlineBattery50,
-      iconColor: 'text-cyan-400',
-      iconBg: 'bg-cyan-500/10',
-      trend: (data?.batteryLevel ?? 0) >= 50 ? 'up' : 'down',
-    },
+    { title: 'Total Generation', value: data?.totalGeneration ?? 0, suffix: ' kWh', icon: HiOutlineBolt, iconColor: 'text-amber-400', iconBg: 'bg-amber-500/10', trend: 'up' },
+    { title: 'Total Consumption', value: data?.totalConsumption ?? 0, suffix: ' kWh', icon: HiOutlineBoltSlash, iconColor: 'text-indigo-400', iconBg: 'bg-indigo-500/10', trend: 'down' },
+    { title: 'Supply/Demand Ratio', value: supplyRatio, suffix: '', icon: HiOutlineScale, iconColor: supplyRatio >= 1 ? 'text-emerald-400' : 'text-red-400', iconBg: supplyRatio >= 1 ? 'bg-emerald-500/10' : 'bg-red-500/10', trend: ratioTrend },
+    { title: 'Battery Level', value: data?.batteryLevel ?? 0, suffix: '%', icon: HiOutlineBattery50, iconColor: 'text-cyan-400', iconBg: 'bg-cyan-500/10', trend: (data?.batteryLevel ?? 0) >= 50 ? 'up' : 'down' },
   ];
 
   const generationAreas = [
@@ -142,60 +103,34 @@ export default function OverviewPage() {
   const alertCount = data?.activeAlerts ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 sm:p-6 lg:p-8">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="mx-auto max-w-7xl"
-      >
+    <div className="page-container">
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="page-inner">
         {/* Header */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-100">Admin Overview</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Real-time energy monitoring dashboard &middot;{' '}
-            {data?.houseCount ?? 0} houses connected
-          </p>
+        <motion.div variants={itemVariants} className="page-header">
+          <h1 className="page-title">Admin Overview</h1>
+          <p className="page-subtitle">Real-time energy monitoring dashboard &middot; {data?.houseCount ?? 0} houses connected</p>
         </motion.div>
 
         {/* Stat Cards */}
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
-        >
+        <motion.div variants={containerVariants} className="grid-metrics">
           {statCards.map((card) => {
             const Icon = card.icon;
-            const TrendIcon =
-              card.trend === 'up'
-                ? HiOutlineArrowTrendingUp
-                : HiOutlineArrowTrendingDown;
-            const trendColor =
-              card.trend === 'up' ? 'text-emerald-400' : 'text-red-400';
+            const TrendIcon = card.trend === 'up' ? HiOutlineArrowTrendingUp : HiOutlineArrowTrendingDown;
 
             return (
               <motion.div key={card.title} variants={itemVariants}>
-                <GlassCard hover className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.iconBg}`}
-                    >
-                      <Icon className={`h-5 w-5 ${card.iconColor}`} />
+                <GlassCard hover className="metric-card">
+                  <div className="metric-header">
+                    <div className="metric-icon-wrapper">
+                      <Icon className="metric-icon" />
                     </div>
-                    <div className={`flex items-center gap-1 ${trendColor}`}>
-                      <TrendIcon className="h-4 w-4" />
+                    <div className={`metric-trend ${card.trend}`}>
+                      <TrendIcon style={{ width: '1rem', height: '1rem' }} />
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                      {card.title}
-                    </p>
-                    <div className="mt-1">
-                      <AnimatedCounter
-                        value={card.value}
-                        suffix={card.suffix}
-                        className="text-2xl font-bold text-slate-100"
-                      />
-                    </div>
+                  <div className="metric-info">
+                    <p className="metric-label">{card.title}</p>
+                    <AnimatedCounter value={card.value} suffix={card.suffix} className="metric-value" />
                   </div>
                 </GlassCard>
               </motion.div>
@@ -204,103 +139,73 @@ export default function OverviewPage() {
         </motion.div>
 
         {/* Charts Row */}
-        <motion.div
-          variants={containerVariants}
-          className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2"
-        >
+        <motion.div variants={containerVariants} className="grid-charts mt-6">
           {/* Generation Chart */}
           <motion.div variants={itemVariants}>
-            <GlassCard hover={false} className="p-5">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
-                  <RiSunLine className="h-4.5 w-4.5 text-amber-400" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-200">
-                    Hourly Generation
-                  </h3>
-                  <p className="text-xs text-slate-500">Last 24 hours</p>
+            <GlassCard hover={false} className="chart-card">
+              <div className="chart-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <div className="metric-icon-wrapper bg-amber-500/10">
+                    <RiSunLine className="metric-icon" style={{ color: "#f59e0b" }} />
+                  </div>
+                  <div>
+                    <h3 className="chart-title">Hourly Generation</h3>
+                    <p className="chart-subtitle">Last 24 hours</p>
+                  </div>
                 </div>
               </div>
-              <AnimatedAreaChart
-                data={data?.hourlyGeneration ?? []}
-                areas={generationAreas}
-                xKey="hour"
-                height={280}
-                showLegend
-              />
+              <div className="chart-area">
+                <AnimatedAreaChart data={data?.hourlyGeneration ?? []} areas={generationAreas} xKey="hour" height={280} showLegend />
+              </div>
             </GlassCard>
           </motion.div>
 
           {/* Consumption Chart */}
           <motion.div variants={itemVariants}>
-            <GlassCard hover={false} className="p-5">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/10">
-                  <HiOutlineBolt className="h-4.5 w-4.5 text-indigo-400" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-200">
-                    Hourly Consumption
-                  </h3>
-                  <p className="text-xs text-slate-500">Last 24 hours</p>
+            <GlassCard hover={false} className="chart-card">
+              <div className="chart-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <div className="metric-icon-wrapper bg-indigo-500/10">
+                    <HiOutlineBolt className="metric-icon" style={{ color: "#6366f1" }} />
+                  </div>
+                  <div>
+                    <h3 className="chart-title">Hourly Consumption</h3>
+                    <p className="chart-subtitle">Last 24 hours</p>
+                  </div>
                 </div>
               </div>
-              <AnimatedBarChart
-                data={data?.hourlyConsumption ?? []}
-                bars={consumptionBars}
-                xKey="hour"
-                height={280}
-              />
+              <div className="chart-area">
+                <AnimatedBarChart data={data?.hourlyConsumption ?? []} bars={consumptionBars} xKey="hour" height={280} />
+              </div>
             </GlassCard>
           </motion.div>
         </motion.div>
 
         {/* Active Alerts */}
         <motion.div variants={itemVariants} className="mt-6">
-          <GlassCard hover={false} className="p-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                    alertCount > 0 ? 'bg-red-500/10' : 'bg-emerald-500/10'
-                  }`}
-                >
-                  <HiOutlineExclamationTriangle
-                    className={`h-4.5 w-4.5 ${
-                      alertCount > 0 ? 'text-red-400' : 'text-emerald-400'
-                    }`}
-                  />
+          <GlassCard hover={false} className="chart-card">
+            <div className="flex-row-between">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div className="metric-icon-wrapper" style={{ backgroundColor: alertCount > 0 ? "rgba(239, 68, 68, 0.1)" : "rgba(16, 185, 129, 0.1)" }}>
+                  <HiOutlineExclamationTriangle className="metric-icon" style={{ color: alertCount > 0 ? "#f87171" : "#34d399" }} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-200">
-                    Active Alerts
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    System notifications and warnings
-                  </p>
+                  <h3 className="chart-title">Active Alerts</h3>
+                  <p className="chart-subtitle">System notifications and warnings</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div>
                 {alertCount > 0 ? (
-                  <>
-                    <StatusBadge
-                      status={alertCount >= 5 ? 'critical' : 'warning'}
-                      label={`${alertCount} active`}
-                    />
-                  </>
+                  <StatusBadge status={alertCount >= 5 ? 'critical' : 'warning'} label={`${alertCount} active`} />
                 ) : (
                   <StatusBadge status="ok" label="All clear" />
                 )}
               </div>
             </div>
             {alertCount > 0 && (
-              <div className="mt-4 rounded-xl bg-red-500/5 border border-red-500/10 p-4">
-                <p className="text-sm text-red-300">
-                  There {alertCount === 1 ? 'is' : 'are'}{' '}
-                  <span className="font-semibold">{alertCount}</span> active
-                  alert{alertCount !== 1 && 's'} requiring attention. Visit the
-                  Fairness &amp; Alerts page for details.
+              <div className="mt-4 p-4" style={{ backgroundColor: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.1)", borderRadius: "0.75rem" }}>
+                <p style={{ fontSize: "0.875rem", color: "#fca5a5" }}>
+                  There {alertCount === 1 ? 'is' : 'are'} <span style={{ fontWeight: 600 }}>{alertCount}</span> active alert{alertCount !== 1 && 's'} requiring attention. Visit the Fairness & Alerts page for details.
                 </p>
               </div>
             )}

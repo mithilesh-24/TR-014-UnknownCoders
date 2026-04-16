@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 
 export default function LoadingSpinner() {
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--bg-primary)] z-50">
+    <div className="spinner-overlay">
       <motion.div
-        className="w-16 h-16 rounded-full border-[3px] border-transparent"
+        className="spinner-circle"
         style={{
           borderTopColor: "var(--accent)",
           borderRightColor: "var(--accent-secondary)",
@@ -17,7 +17,7 @@ export default function LoadingSpinner() {
         }}
       />
       <motion.p
-        className="mt-6 text-[var(--text-secondary)] text-sm tracking-widest uppercase"
+        className="spinner-text"
         initial={{ opacity: 0 }}
         animate={{ opacity: [0.3, 1, 0.3] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}

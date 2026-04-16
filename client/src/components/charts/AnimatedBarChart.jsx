@@ -65,6 +65,9 @@ const AnimatedBarChart = ({
               fill={bar.fill}
               radius={bar.radius ?? [4, 4, 0, 0]}
               maxBarSize={bar.maxBarSize ?? 40}
+              isAnimationActive={true}
+              animationDuration={1200}
+              animationEasing="ease-out"
             />
           ))}
         </BarChart>

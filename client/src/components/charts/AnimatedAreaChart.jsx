@@ -69,6 +69,9 @@ const AnimatedAreaChart = ({
               strokeWidth={area.strokeWidth ?? 2}
               dot={false}
               activeDot={{ r: 4, strokeWidth: 0 }}
+              isAnimationActive={true}
+              animationDuration={1200}
+              animationEasing="ease-out"
             />
           ))}
         </AreaChart>

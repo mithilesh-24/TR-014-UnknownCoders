@@ -26,9 +26,9 @@ const item = {
 
 function getNodeColor(allocatedEnergy, maxAllocation) {
   const ratio = allocatedEnergy / (maxAllocation || 1);
-  if (ratio >= 0.7) return { ring: "border-emerald-400", bg: "bg-emerald-400", text: "text-emerald-400", glow: "shadow-[0_0_12px_rgba(52,211,153,0.4)]" };
-  if (ratio >= 0.4) return { ring: "border-yellow-400", bg: "bg-yellow-400", text: "text-yellow-400", glow: "shadow-[0_0_12px_rgba(250,204,21,0.4)]" };
-  return { ring: "border-red-400", bg: "bg-red-400", text: "text-red-400", glow: "shadow-[0_0_12px_rgba(248,113,113,0.4)]" };
+  if (ratio >= 0.7) return { border: "rgba(52, 211, 153, 0.5)", bg: "#34d399", text: "#34d399", glow: "0 0 12px rgba(52,211,153,0.4)" };
+  if (ratio >= 0.4) return { border: "rgba(250, 204, 21, 0.5)", bg: "#facc15", text: "#facc15", glow: "0 0 12px rgba(250,204,21,0.4)" };
+  return { border: "rgba(248, 113, 113, 0.5)", bg: "#f87171", text: "#f87171", glow: "0 0 12px rgba(248,113,113,0.4)" };
 }
 
 function formatHour(hour) {
@@ -41,57 +41,56 @@ function formatHour(hour) {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 animate-pulse">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="h-10 w-56 bg-white/5 rounded-xl" />
-        <div className="h-40 bg-white/5 rounded-2xl" />
-        <div className="h-72 bg-white/5 rounded-2xl" />
-        <div className="h-24 bg-white/5 rounded-2xl" />
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" />
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "10rem" }} />
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "18rem" }} />
+      <div className="grid-metrics">
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "6rem" }} />
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "6rem" }} />
       </div>
     </div>
   );
 }
 
-function TimelineNode({ forecast, index, isFirst, maxAllocation, totalNodes }) {
+function TimelineNode({ forecast, index, maxAllocation }) {
   const colors = getNodeColor(forecast.allocatedEnergy, maxAllocation);
   const isCurrentHour = index === 0;
 
   return (
     <motion.div
-      className="flex flex-col items-center relative flex-1"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", flex: 1 }}
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: index * 0.15 }}
     >
       {/* Hour label */}
-      <span className={`text-xs font-medium mb-3 ${isCurrentHour ? "text-indigo-300" : "text-slate-400"}`}>
+      <span style={{ fontSize: "0.75rem", fontWeight: "500", marginBottom: "0.75rem", color: isCurrentHour ? "#a5b4fc" : "var(--text-secondary)" }}>
         {isCurrentHour ? "Now" : formatHour(forecast.hour)}
       </span>
 
       {/* Node */}
-      <div className="relative">
+      <div style={{ position: "relative" }}>
         {isCurrentHour && (
           <motion.div
-            className={`absolute inset-0 rounded-full ${colors.bg} opacity-30`}
+            style={{ position: "absolute", inset: 0, borderRadius: "50%", backgroundColor: colors.bg, opacity: 0.3, margin: "-4px" }}
             animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0, 0.3] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            style={{ margin: "-4px" }}
           />
         )}
         <div
-          className={`w-10 h-10 md:w-12 md:h-12 rounded-full border-2 ${colors.ring} ${colors.glow}
-            bg-[#0a0a0f] flex items-center justify-center z-10 relative`}
+          style={{ width: "3rem", height: "3rem", borderRadius: "50%", border: `2px solid ${colors.border}`, boxShadow: colors.glow, backgroundColor: "transparent", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, position: "relative" }}
         >
-          <HiBolt className={`text-sm md:text-base ${colors.text}`} />
+          <HiBolt style={{ fontSize: "1rem", color: colors.text }} />
         </div>
       </div>
 
       {/* Allocated energy */}
-      <div className="mt-3 text-center">
-        <p className={`text-sm md:text-base font-bold ${colors.text}`}>
+      <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+        <p style={{ fontSize: "1rem", fontWeight: "700", color: colors.text }}>
           {forecast.allocatedEnergy} kWh
         </p>
-        <p className="text-[10px] md:text-xs text-slate-500 mt-0.5">
+        <p style={{ fontSize: "0.625rem", color: "var(--text-secondary)", marginTop: "0.125rem" }}>
           {forecast.confidence}% conf
         </p>
       </div>
@@ -99,16 +98,15 @@ function TimelineNode({ forecast, index, isFirst, maxAllocation, totalNodes }) {
   );
 }
 
-function ConnectingLine({ index, total }) {
+function ConnectingLine({ index }) {
   return (
     <motion.div
-      className="flex-1 flex items-center -mx-1 mt-4"
+      style={{ flex: 1, display: "flex", alignItems: "center", margin: "1rem -0.25rem 0", transformOrigin: "left" }}
       initial={{ scaleX: 0 }}
       animate={{ scaleX: 1 }}
       transition={{ duration: 0.4, delay: index * 0.15 + 0.2 }}
-      style={{ originX: 0 }}
     >
-      <div className="w-full h-[2px] bg-gradient-to-r from-indigo-500/60 to-purple-500/40 rounded-full" />
+      <div style={{ width: "100%", height: "2px", background: "linear-gradient(90deg, rgba(99, 102, 241, 0.6), rgba(168, 85, 247, 0.4))", borderRadius: "9999px" }} />
     </motion.div>
   );
 }
@@ -142,11 +140,11 @@ export default function ForecastPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-        <GlassCard className="p-8 text-center max-w-md">
-          <HiClock className="text-red-400 text-4xl mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Failed to load forecast</h2>
-          <p className="text-slate-400 text-sm">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-6 text-center" style={{ maxWidth: '28rem' }}>
+          <HiClock style={{ fontSize: "2.25rem", color: "#f87171", margin: '0 auto 1rem' }} />
+          <h2 className="page-title mb-2">Failed to load forecast</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
@@ -170,48 +168,41 @@ export default function ForecastPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 md:p-6 lg:p-8">
-      <motion.div
-        className="max-w-6xl mx-auto space-y-6"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
+    <div className="page-container">
+      <motion.div className="page-inner-md" variants={container} initial="hidden" animate="show">
         {/* Header */}
-        <motion.div variants={item} className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-            <HiArrowTrendingUp className="text-indigo-400 text-xl" />
+        <motion.div variants={item} style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
+          <div style={{ padding: "0.625rem", borderRadius: "0.75rem", backgroundColor: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.2)" }}>
+            <HiArrowTrendingUp style={{ fontSize: "1.25rem", color: "#818cf8" }} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Energy Forecast</h1>
-            <p className="text-slate-400 text-sm">Next {nextHours} hours outlook</p>
+            <h1 className="page-title">Energy Forecast</h1>
+            <p className="page-subtitle">Next {nextHours} hours outlook</p>
           </div>
         </motion.div>
 
         {/* Visual Timeline */}
-        <motion.div variants={item}>
-          <GlassCard className="p-5 md:p-8">
-            <h2 className="text-lg font-semibold text-white mb-6">Allocation Timeline</h2>
-
+        <motion.div variants={item} className="mt-6">
+          <GlassCard className="chart-card">
+            <h2 className="chart-title">Allocation Timeline</h2>
+            
             {forecasts.length > 0 ? (
-              <div className="flex items-start px-2 md:px-6 overflow-x-auto pb-2">
+              <div style={{ display: "flex", alignItems: "flex-start", padding: "0 1.5rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
                 {forecasts.map((forecast, index) => (
-                  <div key={index} className="contents">
+                  <div key={index} style={{ display: "contents" }}>
                     <TimelineNode
                       forecast={forecast}
                       index={index}
-                      isFirst={index === 0}
                       maxAllocation={maxAllocation}
-                      totalNodes={forecasts.length}
                     />
                     {index < forecasts.length - 1 && (
-                      <ConnectingLine index={index} total={forecasts.length} />
+                      <ConnectingLine index={index} />
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center text-slate-500 py-10">
+              <div className="flex-col-center py-10" style={{ color: "var(--text-secondary)" }}>
                 No forecast data available
               </div>
             )}
@@ -219,37 +210,39 @@ export default function ForecastPage() {
         </motion.div>
 
         {/* Bar Chart: Allocated vs Predicted */}
-        <motion.div variants={item}>
-          <GlassCard className="p-5 md:p-6">
-            <div className="flex items-center justify-between mb-4">
+        <motion.div variants={item} className="mt-6">
+          <GlassCard className="chart-card">
+            <div className="chart-header">
               <div>
-                <h2 className="text-lg font-semibold text-white">Allocated vs Predicted Demand</h2>
-                <p className="text-slate-400 text-xs mt-0.5">Comparison for upcoming hours</p>
+                <h2 className="chart-title">Allocated vs Predicted Demand</h2>
+                <p className="chart-subtitle">Comparison for upcoming hours</p>
               </div>
-              <div className="flex items-center gap-4 text-xs">
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" />
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem", fontSize: "0.75rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-secondary)" }}>
+                  <span style={{ width: "0.625rem", height: "0.625rem", borderRadius: "0.125rem", backgroundColor: "#6366f1" }} />
                   Allocated
                 </span>
-                <span className="flex items-center gap-1.5 text-slate-400">
-                  <span className="w-2.5 h-2.5 rounded-sm bg-purple-500/60" />
+                <span style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-secondary)" }}>
+                  <span style={{ width: "0.625rem", height: "0.625rem", borderRadius: "0.125rem", backgroundColor: "rgba(168, 85, 247, 0.6)" }} />
                   Predicted
                 </span>
               </div>
             </div>
             {barChartData.length > 0 ? (
-              <AnimatedBarChart
-                data={barChartData}
-                bars={[
-                  { dataKey: "allocated", name: "Allocated", fill: "#6366f1", radius: [4, 4, 0, 0] },
-                  { dataKey: "predicted", name: "Predicted", fill: "#8b5cf6", radius: [4, 4, 0, 0] },
-                ]}
-                xKey="hour"
-                height={300}
-                showLegend={false}
-              />
+              <div className="chart-area">
+                <AnimatedBarChart
+                  data={barChartData}
+                  bars={[
+                    { dataKey: "allocated", name: "Allocated", fill: "#6366f1", radius: [4, 4, 0, 0] },
+                    { dataKey: "predicted", name: "Predicted", fill: "#8b5cf6", radius: [4, 4, 0, 0] },
+                  ]}
+                  xKey="hour"
+                  height={300}
+                  showLegend={false}
+                />
+              </div>
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-500 text-sm">
+              <div className="flex-col-center h-full chart-area" style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
                 No forecast data to display
               </div>
             )}
@@ -257,22 +250,22 @@ export default function ForecastPage() {
         </motion.div>
 
         {/* Confidence & Tips */}
-        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div variants={item} className="grid-metrics mt-6">
           {/* Average Confidence */}
-          <GlassCard className="p-5">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <HiChartBar className="text-indigo-400" />
+          <GlassCard className="metric-card">
+            <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiChartBar style={{ color: "#818cf8" }} />
               Forecast Confidence
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400 text-sm">Average confidence</span>
-                <span className="text-white font-bold text-lg">{avgConfidence}%</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Average confidence</span>
+                <span style={{ fontSize: "1.125rem", fontWeight: "700", color: "var(--text-primary)" }}>{avgConfidence}%</span>
               </div>
-              <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+              <div style={{ width: "100%", height: "0.75rem", backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "9999px", overflow: "hidden" }}>
                 <motion.div
-                  className="h-full rounded-full"
                   style={{
+                    height: "100%", borderRadius: "9999px",
                     background: `linear-gradient(90deg, #6366f1, #8b5cf6, ${
                       avgConfidence > 70 ? "#10b981" : avgConfidence > 40 ? "#f59e0b" : "#ef4444"
                     })`,
@@ -282,7 +275,7 @@ export default function ForecastPage() {
                   transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] text-slate-600">
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.625rem", color: "#475569" }}>
                 <span>Low</span>
                 <span>Medium</span>
                 <span>High</span>
@@ -291,53 +284,52 @@ export default function ForecastPage() {
           </GlassCard>
 
           {/* Tips */}
-          <GlassCard className="p-5">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <HiLightBulb className="text-yellow-400" />
+          <GlassCard className="metric-card">
+            <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiLightBulb style={{ color: "#facc15" }} />
               Smart Tips
             </h3>
-            <div className="space-y-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {peakForecast && (
                 <motion.div
-                  className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10"
+                  style={{ padding: "0.75rem", borderRadius: "0.75rem", backgroundColor: "rgba(245, 158, 11, 0.05)", border: "1px solid rgba(245, 158, 11, 0.1)" }}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <p className="text-slate-300 text-sm">
+                  <p style={{ color: "#cbd5e1", fontSize: "0.875rem", lineHeight: 1.5 }}>
                     Based on the forecast, consider reducing usage at{" "}
-                    <span className="text-amber-400 font-semibold">
+                    <span style={{ color: "#fbbf24", fontWeight: "600" }}>
                       {formatHour(peakForecast.hour)}
                     </span>{" "}
                     when demand peaks at{" "}
-                    <span className="text-amber-400 font-semibold">
+                    <span style={{ color: "#fbbf24", fontWeight: "600" }}>
                       {peakForecast.predictedDemand} kWh
-                    </span>
-                    .
+                    </span>.
                   </p>
                 </motion.div>
               )}
               <motion.div
-                className="p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10"
+                style={{ padding: "0.75rem", borderRadius: "0.75rem", backgroundColor: "rgba(99, 102, 241, 0.05)", border: "1px solid rgba(99, 102, 241, 0.1)" }}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.7 }}
               >
-                <p className="text-slate-300 text-sm">
+                <p style={{ color: "#cbd5e1", fontSize: "0.875rem", lineHeight: 1.5 }}>
                   Shift heavy appliance usage to hours with{" "}
-                  <span className="text-indigo-400 font-semibold">high allocation</span>{" "}
+                  <span style={{ color: "#818cf8", fontWeight: "600" }}>high allocation</span>{" "}
                   for optimal energy distribution.
                 </p>
               </motion.div>
               <motion.div
-                className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/10"
+                style={{ padding: "0.75rem", borderRadius: "0.75rem", backgroundColor: "rgba(168, 85, 247, 0.05)", border: "1px solid rgba(168, 85, 247, 0.1)" }}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.9 }}
               >
-                <p className="text-slate-300 text-sm">
+                <p style={{ color: "#cbd5e1", fontSize: "0.875rem", lineHeight: 1.5 }}>
                   Forecasts refresh every hour. Plan ahead for the most{" "}
-                  <span className="text-purple-400 font-semibold">efficient energy usage</span>.
+                  <span style={{ color: "#c084fc", fontWeight: "600" }}>efficient energy usage</span>.
                 </p>
               </motion.div>
             </div>

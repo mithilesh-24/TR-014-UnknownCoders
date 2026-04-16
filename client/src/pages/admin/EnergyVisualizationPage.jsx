@@ -230,7 +230,7 @@ export default function EnergyVisualizationPage() {
           pointerEvents: "none",
         }}
       >
-        <GlassCard className="p-4" style={{ maxWidth: "320px" }}>
+        <GlassCard style={{ padding: "1rem", maxWidth: "320px" }}>
           <h1
             style={{
               fontSize: "18px",
@@ -274,7 +274,7 @@ export default function EnergyVisualizationPage() {
           zIndex: 10,
         }}
       >
-        <GlassCard className="p-3">
+        <GlassCard style={{ padding: "0.75rem" }}>
           <div
             style={{
               fontSize: "10px",
@@ -333,7 +333,7 @@ export default function EnergyVisualizationPage() {
               zIndex: 10,
             }}
           >
-            <GlassCard className="p-4" style={{ minWidth: "220px" }}>
+            <GlassCard style={{ padding: "1rem", minWidth: "220px" }}>
               <div
                 style={{
                   display: "flex",

@@ -9,10 +9,7 @@ import useApi from "../../hooks/useApi";
 
 const container = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const item = {
@@ -28,17 +25,14 @@ const statusLabels = {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 animate-pulse">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="h-10 w-64 bg-white/5 rounded-xl" />
-        <div className="h-6 w-40 bg-white/5 rounded-lg" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white/5 rounded-2xl" />
-          ))}
-        </div>
-        <div className="h-80 bg-white/5 rounded-2xl" />
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" />
+      <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="skeleton-pulse skeleton-metric" style={{ animationDelay: `${i * 100}ms` }} />
+        ))}
       </div>
+      <div className="skeleton-pulse skeleton-chart-full" />
     </div>
   );
 }
@@ -72,11 +66,11 @@ export default function UserHomePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-        <GlassCard className="p-8 text-center max-w-md">
-          <HiBolt className="text-red-400 text-4xl mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Failed to load dashboard</h2>
-          <p className="text-slate-400 text-sm">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-6 text-center" style={{ maxWidth: '28rem' }}>
+          <HiBolt style={{ width: '3rem', height: '3rem', color: '#f87171', margin: '0 auto 1rem' }} />
+          <h2 className="page-title mb-2">Failed to load dashboard</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
@@ -101,128 +95,106 @@ export default function UserHomePage() {
     : "N/A";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 md:p-6 lg:p-8">
-      <motion.div
-        className="max-w-6xl mx-auto space-y-6"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
+    <div className="page-container">
+      <motion.div className="page-inner-md" variants={container} initial="hidden" animate="show">
         {/* Welcome Section */}
-        <motion.div variants={item} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div variants={item} className="flex-row-between page-header" style={{ flexWrap: "wrap", gap: "1rem" }}>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
+            <h1 className="page-title" style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
               Welcome back,{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                House #{house?.houseNumber}
-              </span>
+              <span className="gradient-text">House #{house?.houseNumber}</span>
             </h1>
-            <p className="text-slate-400 text-sm flex items-center gap-2">
-              <HiHome className="text-indigo-400" />
+            <p className="page-subtitle" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiHome style={{ color: "var(--accent)" }} />
               {house?.address || "Address not available"}
             </p>
           </div>
-          <StatusBadge
-            status={status || "ok"}
-            label={statusLabels[status] || "Supply Stable"}
-            size="lg"
-          />
+          <StatusBadge status={status || "ok"} label={statusLabels[status] || "Supply Stable"} size="lg" />
         </motion.div>
 
         {/* Stat Cards */}
-        <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div variants={item} className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
           {/* Units consumed today */}
-          <GlassCard hover className="p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">
-                  Today's Consumption
-                </p>
+          <GlassCard hover className="metric-card">
+            <div className="metric-header">
+              <div className="metric-info">
+                <p className="metric-label">Today's Consumption</p>
                 <AnimatedCounter
                   value={todayConsumption || 0}
                   suffix=" kWh"
-                  className="text-2xl md:text-3xl font-bold text-white"
+                  className="metric-value"
                   duration={1.2}
                 />
               </div>
-              <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                <HiBolt className="text-indigo-400 text-xl" />
+              <div className="metric-icon-wrapper" style={{ backgroundColor: "rgba(99, 102, 241, 0.1)" }}>
+                <HiBolt className="metric-icon" style={{ color: "#818cf8" }} />
               </div>
             </div>
           </GlassCard>
 
           {/* Current allocation */}
-          <GlassCard hover className="p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">
-                  Current Allocation
-                </p>
+          <GlassCard hover className="metric-card">
+            <div className="metric-header">
+              <div className="metric-info">
+                <p className="metric-label">Current Allocation</p>
                 <AnimatedCounter
                   value={currentAllocation || 0}
                   suffix=" kWh"
-                  className="text-2xl md:text-3xl font-bold text-white"
+                  className="metric-value"
                   duration={1.2}
                 />
               </div>
-              <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                <HiChartBar className="text-purple-400 text-xl" />
+              <div className="metric-icon-wrapper" style={{ backgroundColor: "rgba(168, 85, 247, 0.1)" }}>
+                <HiChartBar className="metric-icon" style={{ color: "#c084fc" }} />
               </div>
             </div>
           </GlassCard>
 
           {/* House number */}
-          <GlassCard hover className="p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-slate-400 text-xs uppercase tracking-wider mb-2">
-                  House Number
-                </p>
+          <GlassCard hover className="metric-card">
+            <div className="metric-header">
+              <div className="metric-info">
+                <p className="metric-label">House Number</p>
                 <AnimatedCounter
                   value={house?.houseNumber || 0}
                   prefix="#"
-                  className="text-2xl md:text-3xl font-bold text-white"
+                  className="metric-value"
                   duration={0.8}
                 />
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <HiHome className="text-emerald-400 text-xl" />
+              <div className="metric-icon-wrapper" style={{ backgroundColor: "rgba(16, 185, 129, 0.1)" }}>
+                <HiHome className="metric-icon" style={{ color: "#34d399" }} />
               </div>
             </div>
           </GlassCard>
         </motion.div>
 
         {/* Hourly Usage Chart */}
-        <motion.div variants={item}>
-          <GlassCard className="p-5 md:p-6">
-            <div className="flex items-center justify-between mb-4">
+        <motion.div variants={item} className="mt-6">
+          <GlassCard className="chart-card">
+            <div className="chart-header">
               <div>
-                <h2 className="text-lg font-semibold text-white">Today's Hourly Usage</h2>
-                <p className="text-slate-400 text-xs mt-0.5">Live energy consumption</p>
+                <h2 className="chart-title">Today's Hourly Usage</h2>
+                <p className="chart-subtitle">Live energy consumption</p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                kWh consumed
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ width: "0.5rem", height: "0.5rem", borderRadius: "50%", backgroundColor: "#818cf8" }} />
+                <span className="chart-subtitle">kWh consumed</span>
               </div>
             </div>
             {chartData.length > 0 ? (
-              <AnimatedAreaChart
-                data={chartData}
-                areas={[
-                  {
-                    dataKey: "energyUsed",
-                    name: "Energy Used",
-                    stroke: "#6366f1",
-                    fill: "#6366f1",
-                    fillOpacity: 0.15,
-                    strokeWidth: 2.5,
-                  },
-                ]}
-                xKey="hour"
-                height={320}
-              />
+              <div className="chart-area">
+                <AnimatedAreaChart
+                  data={chartData}
+                  areas={[
+                    { dataKey: "energyUsed", name: "Energy Used", stroke: "#6366f1", fill: "#6366f1", fillOpacity: 0.15, strokeWidth: 2.5 },
+                  ]}
+                  xKey="hour"
+                  height={320}
+                />
+              </div>
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-500 text-sm">
+              <div className="flex-col-center h-full chart-area" style={{ color: "var(--text-secondary)" }}>
                 No usage data available for today
               </div>
             )}
@@ -230,8 +202,8 @@ export default function UserHomePage() {
         </motion.div>
 
         {/* Last Updated */}
-        <motion.div variants={item} className="flex items-center justify-center gap-2 text-slate-500 text-xs pb-4">
-          <HiClock className="text-sm" />
+        <motion.div variants={item} className="flex-row-center mt-6" style={{ gap: "0.5rem", color: "var(--text-secondary)", fontSize: "0.75rem", paddingBottom: "1rem" }}>
+          <HiClock />
           <span>Last updated: {formattedLastUpdated}</span>
         </motion.div>
       </motion.div>

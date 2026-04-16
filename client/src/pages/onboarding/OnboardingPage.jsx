@@ -92,32 +92,30 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[var(--bg-primary)] p-4">
+    <div className="onboarding-container">
       {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 left-1/4 w-96 h-96 bg-[var(--accent)]/8 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 right-1/4 w-96 h-96 bg-[var(--accent-secondary)]/8 rounded-full blur-3xl" />
-      </div>
+      <div style={{ position: "absolute", top: "-10rem", left: "25%", width: "24rem", height: "24rem", background: "rgba(139, 92, 246, 0.08)", borderRadius: "50%", filter: "blur(64px)" }} />
+      <div style={{ position: "absolute", bottom: "-10rem", right: "25%", width: "24rem", height: "24rem", background: "rgba(59, 130, 246, 0.08)", borderRadius: "50%", filter: "blur(64px)" }} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-lg relative z-10"
+        className="onboarding-wrapper"
       >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-2">
-            <HiOutlineLightningBolt className="w-6 h-6 text-[var(--accent)]" />
-            <span className="text-lg font-bold gradient-text">SmartEnergy</span>
+        <div className="onboarding-header">
+          <div className="onboarding-header-logo">
+            <HiOutlineLightningBolt />
+            <span className="gradient-text" style={{ fontSize: "1.125rem", fontWeight: "700" }}>SmartEnergy</span>
           </div>
-          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
+          <h2 className="onboarding-title">
             Set up your profile
           </h2>
         </div>
 
         {/* Step Indicator */}
-        <div className="mb-12">
+        <div className="onboarding-step-wrapper">
           <StepIndicator steps={steps} currentStep={currentStep} />
         </div>
 
@@ -128,14 +126,14 @@ export default function OnboardingPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"
+              className="alert-error"
             >
               {error}
             </motion.div>
           )}
         </AnimatePresence>
 
-        <GlassCard className="p-8 overflow-hidden">
+        <GlassCard style={{ padding: "2rem", overflow: "hidden" }}>
           <AnimatePresence mode="wait" custom={direction}>
             {/* Step 1: House Details */}
             {currentStep === 0 && (
@@ -147,49 +145,40 @@ export default function OnboardingPage() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="space-y-5"
+                className="onboarding-step-view"
               >
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-                  House Details
-                </h3>
+                <h3 className="onboarding-step-title">House Details</h3>
 
-                <div>
-                  <label className="block text-sm text-[var(--text-secondary)] mb-2">
-                    House Number
-                  </label>
+                <div className="onboarding-field">
+                  <label className="onboarding-label">House Number</label>
                   <input
                     type="text"
                     value={houseNumber}
                     onChange={(e) => setHouseNumber(e.target.value)}
                     placeholder="e.g., A-101"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[var(--text-primary)] text-sm placeholder:text-[var(--text-secondary)]/50 focus:border-[var(--accent)] transition-colors"
+                    className="onboarding-input"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm text-[var(--text-secondary)] mb-2">
-                    Address
-                  </label>
+                <div className="onboarding-field">
+                  <label className="onboarding-label">Address</label>
                   <textarea
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="Full address"
-                    rows={3}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[var(--text-primary)] text-sm placeholder:text-[var(--text-secondary)]/50 focus:border-[var(--accent)] transition-colors resize-none"
+                    className="onboarding-input onboarding-textarea"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm text-[var(--text-secondary)] mb-2">
-                    Number of Residents
-                  </label>
+                <div className="onboarding-field">
+                  <label className="onboarding-label">Number of Residents</label>
                   <input
                     type="number"
                     min="1"
                     value={residents}
                     onChange={(e) => setResidents(e.target.value)}
                     placeholder="e.g., 4"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[var(--text-primary)] text-sm placeholder:text-[var(--text-secondary)]/50 focus:border-[var(--accent)] transition-colors"
+                    className="onboarding-input"
                   />
                 </div>
               </motion.div>
@@ -205,30 +194,25 @@ export default function OnboardingPage() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="space-y-5"
+                className="onboarding-step-view"
               >
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-                  Verification
-                </h3>
+                <h3 className="onboarding-step-title">Verification</h3>
 
-                <div>
-                  <label className="block text-sm text-[var(--text-secondary)] mb-2">
-                    Aadhaar Number
-                  </label>
+                <div className="onboarding-field">
+                  <label className="onboarding-label">Aadhaar Number</label>
                   <input
                     type="text"
                     value={aadhaarNumber}
                     onChange={(e) => setAadhaarNumber(formatAadhaar(e.target.value))}
                     placeholder="XXXX XXXX XXXX"
                     maxLength={14}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[var(--text-primary)] text-sm font-mono tracking-wider placeholder:text-[var(--text-secondary)]/50 focus:border-[var(--accent)] transition-colors"
+                    className="onboarding-input"
+                    style={{ fontFamily: "monospace", letterSpacing: "0.05em" }}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm text-[var(--text-secondary)] mb-2">
-                    Owner Proof Document
-                  </label>
+                <div className="onboarding-field">
+                  <label className="onboarding-label">Owner Proof Document</label>
                   <FileUpload
                     onFileSelect={(file) => setOwnerProof(file)}
                     accept={{ "image/*": [], "application/pdf": [] }}
@@ -248,27 +232,21 @@ export default function OnboardingPage() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="space-y-5"
+                className="onboarding-step-view"
               >
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-                  Solar Setup
-                </h3>
+                <h3 className="onboarding-step-title">Solar Setup</h3>
 
                 {/* Solar toggle */}
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-                  <span className="text-sm text-[var(--text-primary)]">
-                    Do you have solar panels?
-                  </span>
+                <div className="onboarding-solar-toggle">
+                  <span style={{ fontSize: "0.875rem", color: "var(--text-primary)" }}>Do you have solar panels?</span>
                   <motion.button
                     type="button"
                     onClick={() => setHasSolar(!hasSolar)}
-                    className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${
-                      hasSolar ? "bg-[var(--accent)]" : "bg-white/10"
-                    }`}
+                    className={`onboarding-solar-track ${hasSolar ? "active" : "inactive"}`}
                     whileTap={{ scale: 0.95 }}
                   >
                     <motion.div
-                      className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md"
+                      style={{ position: "absolute", top: "2px", width: "1.5rem", height: "1.5rem", borderRadius: "50%", background: "white", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
                       animate={{ left: hasSolar ? "calc(100% - 26px)" : "2px" }}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
@@ -283,16 +261,12 @@ export default function OnboardingPage() {
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
+                      style={{ overflow: "hidden" }}
                     >
-                      <div className="space-y-3 pt-2">
-                        <div className="flex items-center justify-between">
-                          <label className="text-sm text-[var(--text-secondary)]">
-                            Solar Capacity
-                          </label>
-                          <span className="text-sm font-semibold text-[var(--accent)]">
-                            {solarCapacity} kW
-                          </span>
+                      <div className="onboarding-slider-wrapper">
+                        <div className="onboarding-slider-header">
+                          <span>Solar Capacity</span>
+                          <span>{solarCapacity} kW</span>
                         </div>
                         <input
                           type="range"
@@ -300,18 +274,9 @@ export default function OnboardingPage() {
                           max="50"
                           value={solarCapacity}
                           onChange={(e) => setSolarCapacity(Number(e.target.value))}
-                          className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10
-                            [&::-webkit-slider-thumb]:appearance-none
-                            [&::-webkit-slider-thumb]:w-5
-                            [&::-webkit-slider-thumb]:h-5
-                            [&::-webkit-slider-thumb]:rounded-full
-                            [&::-webkit-slider-thumb]:bg-gradient-to-r
-                            [&::-webkit-slider-thumb]:from-[var(--accent)]
-                            [&::-webkit-slider-thumb]:to-[var(--accent-secondary)]
-                            [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(99,102,241,0.4)]
-                            [&::-webkit-slider-thumb]:cursor-pointer"
+                          className="onboarding-slider"
                         />
-                        <div className="flex justify-between text-xs text-[var(--text-secondary)]">
+                        <div className="onboarding-slider-labels">
                           <span>1 kW</span>
                           <span>50 kW</span>
                         </div>
@@ -321,34 +286,24 @@ export default function OnboardingPage() {
                 </AnimatePresence>
 
                 {/* Summary */}
-                <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
-                  <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
-                    Summary
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">House</span>
-                      <span className="text-[var(--text-primary)]">
-                        {houseNumber || "Not set"}
-                      </span>
+                <div className="onboarding-summary">
+                  <h4 className="onboarding-summary-title">Summary</h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                    <div className="onboarding-summary-row">
+                      <span>House</span>
+                      <span>{houseNumber || "Not set"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Residents</span>
-                      <span className="text-[var(--text-primary)]">
-                        {residents || "Not set"}
-                      </span>
+                    <div className="onboarding-summary-row">
+                      <span>Residents</span>
+                      <span>{residents || "Not set"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Aadhaar</span>
-                      <span className="text-[var(--text-primary)]">
-                        {aadhaarNumber || "Not set"}
-                      </span>
+                    <div className="onboarding-summary-row">
+                      <span>Aadhaar</span>
+                      <span>{aadhaarNumber || "Not set"}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Solar</span>
-                      <span className="text-[var(--text-primary)]">
-                        {hasSolar ? `${solarCapacity} kW` : "No"}
-                      </span>
+                    <div className="onboarding-summary-row">
+                      <span>Solar</span>
+                      <span>{hasSolar ? `${solarCapacity} kW` : "No"}</span>
                     </div>
                   </div>
                 </div>
@@ -357,12 +312,12 @@ export default function OnboardingPage() {
           </AnimatePresence>
 
           {/* Navigation buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+          <div className="onboarding-nav">
             <motion.button
               type="button"
               onClick={goBack}
               disabled={currentStep === 0}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="onboarding-btn-back"
               whileHover={currentStep > 0 ? { scale: 1.02 } : {}}
               whileTap={currentStep > 0 ? { scale: 0.98 } : {}}
             >
@@ -373,10 +328,8 @@ export default function OnboardingPage() {
               <motion.button
                 type="button"
                 onClick={goNext}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white text-sm font-semibold"
-                whileHover={{
-                  boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)",
-                }}
+                className="onboarding-btn-next"
+                whileHover={{ boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)" }}
                 whileTap={{ scale: 0.98 }}
               >
                 Next
@@ -386,10 +339,8 @@ export default function OnboardingPage() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white text-sm font-semibold disabled:opacity-50"
-                whileHover={{
-                  boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)",
-                }}
+                className="onboarding-btn-next"
+                whileHover={{ boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)" }}
                 whileTap={{ scale: 0.98 }}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}

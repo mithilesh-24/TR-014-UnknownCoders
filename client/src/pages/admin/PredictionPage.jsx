@@ -96,19 +96,19 @@ function CircularProgress({ value, size = 120, strokeWidth = 8 }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6">
-      <div className="mb-8 h-10 w-80 animate-pulse rounded-xl bg-white/5" />
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" style={{ width: "20rem", marginBottom: "2rem" }} />
+      <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="h-36 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60"
-            style={{ animationDelay: `${i * 100}ms` }}
+            className="skeleton-pulse skeleton-chart-full"
+            style={{ height: "9rem", animationDelay: `${i * 100}ms` }}
           />
         ))}
       </div>
-      <div className="mt-6 h-96 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
-      <div className="mt-6 h-40 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "24rem", marginTop: "1.5rem" }} />
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "10rem", marginTop: "1.5rem" }} />
     </div>
   );
 }
@@ -232,32 +232,33 @@ export default function PredictionPage() {
 
   if (error && !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f] p-6">
-        <GlassCard className="max-w-md p-8 text-center">
-          <HiOutlineExclamationTriangle className="mx-auto mb-4 h-12 w-12 text-red-400" />
-          <h2 className="mb-2 text-xl font-semibold text-slate-200">Failed to Load</h2>
-          <p className="text-sm text-slate-400">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-8 text-center" style={{ maxWidth: '28rem' }}>
+          <HiOutlineExclamationTriangle style={{ fontSize: "3rem", color: "#f87171", margin: "0 auto 1rem" }} />
+          <h2 className="page-title mb-2">Failed to Load</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
   }
 
+
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 sm:p-6 lg:p-8">
+    <div className="page-container">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="mx-auto max-w-7xl"
+        className="page-inner-lg"
       >
         {/* Header */}
         <motion.div
           variants={itemVariants}
-          className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}
         >
           <div>
-            <h1 className="text-3xl font-bold text-slate-100">48-Hour Energy Forecast</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="page-title">48-Hour Energy Forecast</h1>
+            <p className="page-subtitle" style={{ marginTop: "0.25rem" }}>
               AI-powered predictions for solar, wind, and demand
             </p>
           </div>
@@ -266,10 +267,25 @@ export default function PredictionPage() {
             whileTap={{ scale: 0.97 }}
             onClick={handleGenerateForecast}
             disabled={generating}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              borderRadius: "0.75rem",
+              backgroundColor: "var(--accent)",
+              padding: "0.625rem 1.25rem",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              color: "#fff",
+              boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.2)",
+              transition: "all 0.2s",
+              opacity: generating ? 0.5 : 1,
+              cursor: generating ? "not-allowed" : "pointer",
+              border: "none",
+            }}
           >
             <HiOutlineArrowPath
-              className={`h-4 w-4 ${generating ? 'animate-spin' : ''}`}
+              style={{ fontSize: "1rem", animation: generating ? "spin 1s linear infinite" : "none" }}
             />
             {generating ? 'Generating...' : 'Generate New Forecast'}
           </motion.button>
@@ -278,33 +294,57 @@ export default function PredictionPage() {
         {/* Summary Cards */}
         <motion.div
           variants={containerVariants}
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid-metrics"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}
         >
           {summaryCards.map((card) => {
             const Icon = card.icon;
+            
+            // Generate icon color logic natively
+            let iconColor = "#fbbf24";
+            let bgFill = "rgba(245, 158, 11, 0.1)";
+            if (card.title.includes("Wind")) {
+              iconColor = "#22d3ee";
+              bgFill = "rgba(6, 182, 212, 0.1)";
+            } else if (card.title.includes("Demand")) {
+              iconColor = "#fb7185";
+              bgFill = "rgba(244, 63, 94, 0.1)";
+            } else if (card.title.includes("Lowest Supply")) {
+              iconColor = "#fb923c";
+              bgFill = "rgba(249, 115, 22, 0.1)";
+            }
+
             return (
               <motion.div key={card.title} variants={itemVariants}>
-                <GlassCard hover className="p-5">
-                  <div className="flex items-start justify-between">
+                <GlassCard hover className="metric-card">
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.iconBg}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: "2.5rem",
+                        width: "2.5rem",
+                        borderRadius: "0.75rem",
+                        backgroundColor: bgFill,
+                      }}
                     >
-                      <Icon className={`h-5 w-5 ${card.iconColor}`} />
+                      <Icon style={{ fontSize: "1.25rem", color: iconColor }} />
                     </div>
-                    <div className="flex items-center gap-1 text-slate-500">
-                      <HiOutlineClock className="h-3.5 w-3.5" />
-                      <span className="text-xs">{card.time}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "var(--text-secondary)" }}>
+                      <HiOutlineClock style={{ fontSize: "0.875rem" }} />
+                      <span style={{ fontSize: "0.75rem" }}>{card.time}</span>
                     </div>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                  <div style={{ marginTop: "0.75rem" }}>
+                    <p style={{ fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                       {card.title}
                     </p>
-                    <div className="mt-1">
+                    <div style={{ marginTop: "0.25rem" }}>
                       <AnimatedCounter
                         value={card.value}
                         suffix={card.suffix}
-                        className="text-2xl font-bold text-slate-100"
+                        style={{ fontSize: "1.5rem", fontWeight: "700", color: "var(--text-primary)" }}
                       />
                     </div>
                   </div>
@@ -315,21 +355,23 @@ export default function PredictionPage() {
         </motion.div>
 
         {/* Main Forecast Chart */}
-        <motion.div variants={itemVariants} className="mt-6">
-          <GlassCard hover={false} className="p-5">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-500/10">
-                <RiLineChartLine className="h-4.5 w-4.5 text-purple-400" />
+        <motion.div variants={itemVariants} style={{ marginTop: "1.5rem" }}>
+          <GlassCard hover={false} className="chart-card">
+            <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <div style={{ display: "flex", height: "2.25rem", width: "2.25rem", alignItems: "center", justifyContent: "center", borderRadius: "0.5rem", backgroundColor: "rgba(168, 85, 247, 0.1)" }}>
+                <RiLineChartLine style={{ fontSize: "1.125rem", color: "#c084fc" }} />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-200">Forecast Overview</h3>
-                <p className="text-xs text-slate-500">Predicted generation and demand over 48 hours</p>
+                <h3 className="chart-title">Forecast Overview</h3>
+                <p className="chart-subtitle" style={{ marginTop: "0.125rem" }}>Predicted generation and demand over 48 hours</p>
               </div>
             </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
+              className="chart-area"
+              style={{ marginTop: "1rem" }}
             >
               <ResponsiveContainer width="100%" height={380}>
                 <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -389,59 +431,57 @@ export default function PredictionPage() {
         {/* Confidence Section */}
         <motion.div
           variants={containerVariants}
-          className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3"
+          className="grid-metrics"
+          style={{ gridTemplateColumns: "1fr 2fr", marginTop: "1.5rem" }}
         >
           {/* Average Confidence */}
           <motion.div variants={itemVariants}>
-            <GlassCard hover={false} className="flex flex-col items-center justify-center p-6">
-              <h3 className="mb-4 text-sm font-semibold text-slate-300">
+            <GlassCard hover={false} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "1.5rem", height: "100%" }}>
+              <h3 style={{ marginBottom: "1rem", fontSize: "0.875rem", fontWeight: "600", color: "#cbd5e1" }}>
                 Average Confidence
               </h3>
               <CircularProgress value={avgConfidence} size={140} strokeWidth={10} />
-              <p className="mt-4 text-xs text-slate-500">
+              <p style={{ marginTop: "1rem", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                 Based on {data?.forecasts?.length ?? 0} forecast points
               </p>
             </GlassCard>
           </motion.div>
 
           {/* Individual Confidence Bars */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
-            <GlassCard hover={false} className="p-5">
-              <h3 className="mb-4 text-sm font-semibold text-slate-300">
+          <motion.div variants={itemVariants}>
+            <GlassCard hover={false} className="metric-card" style={{ height: "100%" }}>
+              <h3 style={{ marginBottom: "1rem", fontSize: "0.875rem", fontWeight: "600", color: "#cbd5e1" }}>
                 Confidence Distribution
               </h3>
-              <div className="max-h-72 space-y-2 overflow-y-auto pr-2">
+              <div style={{ maxHeight: "18rem", overflowY: "auto", paddingRight: "0.5rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 {chartData.map((f, index) => {
                   const confidence = f.confidence ?? 0;
-                  const barColor =
-                    confidence >= 80
-                      ? 'bg-emerald-500'
-                      : confidence >= 60
-                        ? 'bg-amber-500'
-                        : confidence >= 40
-                          ? 'bg-orange-500'
-                          : 'bg-red-500';
+                  
+                  let barColor = "#ef4444";
+                  if (confidence >= 80) barColor = "#10b981";
+                  else if (confidence >= 60) barColor = "#f59e0b";
+                  else if (confidence >= 40) barColor = "#f97316";
+
                   return (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.015, duration: 0.3 }}
-                      className="flex items-center gap-3"
+                      style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
                     >
-                      <span className="w-14 shrink-0 text-xs text-slate-500">
+                      <span style={{ width: "3.5rem", flexShrink: 0, fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                         {f.time}
                       </span>
-                      <div className="relative h-5 flex-1 overflow-hidden rounded-full bg-white/[0.04]">
+                      <div style={{ position: "relative", height: "1.25rem", flex: 1, overflow: "hidden", borderRadius: "9999px", backgroundColor: "rgba(255,255,255,0.04)" }}>
                         <motion.div
-                          className={`absolute inset-y-0 left-0 rounded-full ${barColor}`}
+                          style={{ position: "absolute", inset: "0 auto 0 0", borderRadius: "9999px", backgroundColor: barColor, opacity: 0.7 }}
                           initial={{ width: 0 }}
                           animate={{ width: `${confidence}%` }}
                           transition={{ duration: 0.8, delay: index * 0.015 + 0.2 }}
-                          style={{ opacity: 0.7 }}
                         />
                       </div>
-                      <span className="w-10 shrink-0 text-right text-xs font-medium text-slate-400">
+                      <span style={{ width: "2.5rem", flexShrink: 0, textAlign: "right", fontSize: "0.75rem", fontWeight: "500", color: "#94a3b8" }}>
                         {Math.round(confidence)}%
                       </span>
                     </motion.div>

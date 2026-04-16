@@ -40,11 +40,11 @@ const alertTypeIcons = {
 };
 
 const alertTypeColors = {
-  shortage: { bg: 'bg-red-500/10', text: 'text-red-400' },
-  'battery-low': { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  'battery_low': { bg: 'bg-amber-500/10', text: 'text-amber-400' },
-  overconsumption: { bg: 'bg-orange-500/10', text: 'text-orange-400' },
-  default: { bg: 'bg-slate-500/10', text: 'text-slate-400' },
+  shortage: { bg: 'rgba(239, 68, 68, 0.1)', text: '#f87171' },
+  'battery-low': { bg: 'rgba(245, 158, 11, 0.1)', text: '#fbbf24' },
+  'battery_low': { bg: 'rgba(245, 158, 11, 0.1)', text: '#fbbf24' },
+  overconsumption: { bg: 'rgba(249, 115, 22, 0.1)', text: '#fb923c' },
+  default: { bg: 'rgba(100, 116, 139, 0.1)', text: '#94a3b8' },
 };
 
 function FairnessGauge({ score, size = 180, strokeWidth = 12 }) {
@@ -113,13 +113,13 @@ function FairnessGauge({ score, size = 180, strokeWidth = 12 }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6">
-      <div className="mb-8 h-10 w-72 animate-pulse rounded-xl bg-white/5" />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="h-72 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
-        <div className="lg:col-span-2 h-72 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" style={{ width: "18rem", marginBottom: "2rem" }} />
+      <div className="grid-metrics" style={{ gridTemplateColumns: "1fr 2fr" }}>
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "18rem" }} />
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "18rem" }} />
       </div>
-      <div className="mt-6 h-96 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60" />
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "24rem", marginTop: "1.5rem" }} />
     </div>
   );
 }
@@ -193,32 +193,24 @@ export default function FairnessPage() {
 
   if (error && !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f] p-6">
-        <GlassCard className="max-w-md p-8 text-center">
-          <HiOutlineExclamationTriangle className="mx-auto mb-4 h-12 w-12 text-red-400" />
-          <h2 className="mb-2 text-xl font-semibold text-slate-200">Failed to Load</h2>
-          <p className="text-sm text-slate-400">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-8 text-center" style={{ maxWidth: '28rem' }}>
+          <HiOutlineExclamationTriangle style={{ fontSize: "3rem", color: "#f87171", margin: "0 auto 1rem" }} />
+          <h2 className="page-title mb-2">Failed to Load</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 sm:p-6 lg:p-8">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="mx-auto max-w-7xl"
-      >
+    <div className="page-container">
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="page-inner-xl">
         {/* Header */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
+        <motion.div variants={itemVariants} style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between", marginBottom: "2rem" }}>
           <div>
-            <h1 className="text-3xl font-bold text-slate-100">Fairness &amp; Alerts</h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <h1 className="page-title">Fairness &amp; Alerts</h1>
+            <p className="page-subtitle" style={{ marginTop: "0.25rem" }}>
               Monitor distribution equity and system alerts
             </p>
           </div>
@@ -227,33 +219,45 @@ export default function FairnessPage() {
             whileTap={{ scale: 0.97 }}
             onClick={handleRunDistribution}
             disabled={distributing}
-            className="flex items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-purple-500/20 transition-all hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              borderRadius: "0.75rem",
+              backgroundColor: "var(--accent)",
+              padding: "0.625rem 1.25rem",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              color: "#fff",
+              boxShadow: "0 10px 15px -3px rgba(139, 92, 246, 0.25)",
+              transition: "all 0.2s",
+              opacity: distributing ? 0.5 : 1,
+              cursor: distributing ? "not-allowed" : "pointer",
+              border: "none",
+            }}
           >
             <HiOutlineArrowPath
-              className={`h-4 w-4 ${distributing ? 'animate-spin' : ''}`}
+              style={{ fontSize: "1rem", animation: distributing ? "spin 1s linear infinite" : "none" }}
             />
             {distributing ? 'Running...' : 'Run Distribution'}
           </motion.button>
         </motion.div>
 
         {/* Top Row: Fairness Gauge + Most Affected */}
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 gap-6 lg:grid-cols-3"
-        >
+        <motion.div variants={containerVariants} className="grid-metrics" style={{ gridTemplateColumns: "1fr 2fr" }}>
           {/* Fairness Score Gauge */}
           <motion.div variants={itemVariants}>
-            <GlassCard hover={false} className="flex flex-col items-center p-6">
-              <div className="mb-4 flex items-center gap-2">
-                <RiShieldCheckLine className="h-5 w-5 text-indigo-400" />
-                <h3 className="text-sm font-semibold text-slate-200">Fairness Score</h3>
+            <GlassCard hover={false} style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "1.5rem", height: "100%" }}>
+              <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <RiShieldCheckLine style={{ height: "1.25rem", width: "1.25rem", color: "#818cf8" }} />
+                <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "#e2e8f0" }}>Fairness Score</h3>
               </div>
               <FairnessGauge score={data?.fairnessScore ?? 0} />
-              <div className="mt-5 w-full rounded-xl bg-white/[0.03] border border-white/[0.04] p-3 text-center">
-                <p className="text-[10px] uppercase tracking-wider text-slate-500">
+              <div style={{ marginTop: "1.25rem", width: "100%", borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.04)", padding: "0.75rem", textAlign: "center" }}>
+                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                   Standard Deviation
                 </p>
-                <p className="mt-0.5 text-lg font-semibold text-slate-200">
+                <p style={{ marginTop: "0.125rem", fontSize: "1.125rem", fontWeight: "600", color: "#e2e8f0" }}>
                   {data?.stdDeviation != null ? data.stdDeviation.toFixed(3) : '-'}
                 </p>
               </div>
@@ -261,22 +265,22 @@ export default function FairnessPage() {
           </motion.div>
 
           {/* Most Affected Houses */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
-            <GlassCard hover={false} className="p-5">
-              <div className="mb-4 flex items-center gap-2">
-                <HiOutlineHome className="h-5 w-5 text-rose-400" />
-                <h3 className="text-sm font-semibold text-slate-200">
+          <motion.div variants={itemVariants}>
+            <GlassCard hover={false} style={{ padding: "1.5rem", height: "100%" }}>
+              <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <HiOutlineHome style={{ height: "1.25rem", width: "1.25rem", color: "#fb7185" }} />
+                <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "#e2e8f0" }}>
                   Most Affected Houses
                 </h3>
               </div>
 
               {houses.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <HiOutlineCheckCircle className="mx-auto h-10 w-10 text-emerald-500/50" />
-                  <p className="mt-3 text-sm text-slate-500">No houses have been affected</p>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "3rem 0", textAlign: "center" }}>
+                  <HiOutlineCheckCircle style={{ margin: "0 auto", height: "2.5rem", width: "2.5rem", color: "rgba(16, 185, 129, 0.5)" }} />
+                  <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>No houses have been affected</p>
                 </div>
               ) : (
-                <div className="max-h-80 space-y-2.5 overflow-y-auto pr-1">
+                <div style={{ maxHeight: "20rem", overflowY: "auto", paddingRight: "0.25rem", display: "flex", flexDirection: "column", gap: "0.625rem" }}>
                   {houses
                     .sort((a, b) => (b.cutCount ?? 0) - (a.cutCount ?? 0))
                     .map((house, index) => {
@@ -288,38 +292,48 @@ export default function FairnessPage() {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05, duration: 0.3 }}
-                          className={`rounded-xl border p-3.5 transition-colors ${
-                            isTopAffected
-                              ? 'border-red-500/10 bg-gradient-to-r from-red-500/[0.04] to-transparent'
-                              : 'border-white/[0.04] bg-white/[0.02]'
-                          }`}
+                          style={{
+                            borderRadius: "0.75rem",
+                            border: "1px solid",
+                            padding: "0.875rem",
+                            transition: "colors 0.2s",
+                            borderColor: isTopAffected ? "rgba(239, 68, 68, 0.1)" : "rgba(255,255,255,0.04)",
+                            background: isTopAffected ? "linear-gradient(to right, rgba(239, 68, 68, 0.04), transparent)" : "rgba(255,255,255,0.02)"
+                          }}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
                               <div
-                                className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold ${
-                                  isTopAffected
-                                    ? 'bg-red-500/15 text-red-400'
-                                    : 'bg-white/[0.06] text-slate-400'
-                                }`}
+                                style={{
+                                  display: "flex",
+                                  height: "2rem",
+                                  width: "2rem",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  borderRadius: "0.5rem",
+                                  fontSize: "0.75rem",
+                                  fontWeight: "700",
+                                  backgroundColor: isTopAffected ? "rgba(239, 68, 68, 0.15)" : "rgba(255,255,255,0.06)",
+                                  color: isTopAffected ? "#f87171" : "#94a3b8"
+                                }}
                               >
                                 #{house.houseNumber}
                               </div>
                               <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-slate-300">
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                  <span style={{ fontSize: "0.875rem", fontWeight: "500", color: "#cbd5e1" }}>
                                     {house.cutCount ?? 0} cuts
                                   </span>
                                   {isTopAffected && (
-                                    <span className="text-[10px] font-medium uppercase tracking-wider text-red-400">
+                                    <span style={{ fontSize: "0.625rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "#f87171" }}>
                                       High Impact
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs text-slate-500">
+                                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                                   Total cut: {house.totalCutAmount != null ? `${Math.round(house.totalCutAmount)} kWh` : '-'}
                                   {house.lastCut && (
-                                    <span className="ml-2">
+                                    <span style={{ marginLeft: "0.5rem" }}>
                                       Last: {new Date(house.lastCut).toLocaleDateString()}
                                     </span>
                                   )}
@@ -328,11 +342,9 @@ export default function FairnessPage() {
                             </div>
                           </div>
                           {/* Impact bar */}
-                          <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
+                          <div style={{ marginTop: "0.625rem", height: "0.375rem", width: "100%", overflow: "hidden", borderRadius: "9999px", backgroundColor: "rgba(255,255,255,0.04)" }}>
                             <motion.div
-                              className={`h-full rounded-full ${
-                                isTopAffected ? 'bg-red-500/60' : 'bg-indigo-500/40'
-                              }`}
+                              style={{ height: "100%", borderRadius: "9999px", backgroundColor: isTopAffected ? "rgba(239, 68, 68, 0.6)" : "rgba(99, 102, 241, 0.4)" }}
                               initial={{ width: 0 }}
                               animate={{ width: `${cutPercent}%` }}
                               transition={{ duration: 0.8, delay: index * 0.05 + 0.2 }}
@@ -348,39 +360,46 @@ export default function FairnessPage() {
         </motion.div>
 
         {/* Alerts Section */}
-        <motion.div variants={itemVariants} className="mt-6">
-          <GlassCard hover={false} className="p-5">
-            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                <HiOutlineBell className="h-5 w-5 text-amber-400" />
-                <h3 className="text-sm font-semibold text-slate-200">System Alerts</h3>
+        <motion.div variants={itemVariants} style={{ marginTop: "1.5rem" }}>
+          <GlassCard hover={false} style={{ padding: "1.5rem" }}>
+            <div style={{ marginBottom: "1rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <HiOutlineBell style={{ height: "1.25rem", width: "1.25rem", color: "#fbbf24" }} />
+                <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "#e2e8f0" }}>System Alerts</h3>
                 {(data?.alerts?.length ?? 0) > 0 && (
-                  <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-medium text-red-400">
+                  <span style={{ marginLeft: "0.25rem", borderRadius: "9999px", backgroundColor: "rgba(239, 68, 68, 0.15)", padding: "0.125rem 0.5rem", fontSize: "0.625rem", fontWeight: "500", color: "#f87171" }}>
                     {data.alerts.length}
                   </span>
                 )}
               </div>
 
               {/* Filter Tabs */}
-              <div className="flex rounded-xl bg-white/[0.04] border border-white/[0.06] p-1">
+              <div style={{ display: "flex", borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", padding: "0.25rem", overflowX: "auto" }}>
                 {alertFilterTabs.map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setAlertFilter(tab)}
-                    className={`relative rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                      alertFilter === tab
-                        ? 'text-white'
-                        : 'text-slate-400 hover:text-slate-300'
-                    }`}
+                    style={{
+                      position: "relative",
+                      borderRadius: "0.5rem",
+                      padding: "0.375rem 0.75rem",
+                      fontSize: "0.75rem",
+                      fontWeight: "500",
+                      transition: "colors 0.2s",
+                      color: alertFilter === tab ? "#fff" : "var(--text-secondary)",
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer"
+                    }}
                   >
                     {alertFilter === tab && (
                       <motion.div
                         layoutId="alert-tab"
-                        className="absolute inset-0 rounded-lg bg-indigo-500/20 border border-indigo-500/30"
+                        style={{ position: "absolute", inset: 0, borderRadius: "0.5rem", backgroundColor: "rgba(99, 102, 241, 0.2)", border: "1px solid rgba(99, 102, 241, 0.3)" }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                       />
                     )}
-                    <span className="relative z-10">{tab}</span>
+                    <span style={{ position: "relative", zIndex: 10 }}>{tab}</span>
                   </button>
                 ))}
               </div>
@@ -394,17 +413,17 @@ export default function FairnessPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex flex-col items-center justify-center py-12 text-center"
+                  style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "3rem 0", textAlign: "center" }}
                 >
-                  <HiOutlineCheckCircle className="mx-auto h-12 w-12 text-emerald-500/40" />
-                  <p className="mt-3 text-sm text-slate-500">
+                  <HiOutlineCheckCircle style={{ margin: "0 auto", height: "3rem", width: "3rem", color: "rgba(16, 185, 129, 0.4)" }} />
+                  <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
                     {alertFilter === 'All'
                       ? 'No active alerts - system is running smoothly'
                       : `No ${alertFilter.toLowerCase()} alerts`}
                   </p>
                 </motion.div>
               ) : (
-                <div className="space-y-3">
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                   {filteredAlerts.map((alert, index) => {
                     const origIndex = data.alerts.indexOf(alert);
                     const type = (alert.type || '').toLowerCase().replace('_', '-');
@@ -419,36 +438,65 @@ export default function FairnessPage() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
                         transition={{ delay: index * 0.04, duration: 0.3 }}
-                        className="flex items-start gap-4 rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 transition-colors hover:bg-white/[0.03]"
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "1rem",
+                          borderRadius: "0.75rem",
+                          border: "1px solid rgba(255,255,255,0.04)",
+                          backgroundColor: "rgba(255,255,255,0.02)",
+                          padding: "1rem",
+                          transition: "background-color 0.2s"
+                        }}
                       >
                         <div
-                          className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${colors.bg}`}
+                          style={{
+                            marginTop: "0.125rem",
+                            display: "flex",
+                            height: "2.25rem",
+                            width: "2.25rem",
+                            flexShrink: 0,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "0.5rem",
+                            backgroundColor: colors.bg
+                          }}
                         >
-                          <Icon className={`h-4.5 w-4.5 ${colors.text}`} />
+                          <Icon style={{ height: "1.125rem", width: "1.125rem", color: colors.text }} />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-start justify-between gap-2">
-                            <p className="text-sm text-slate-200">{alert.message}</p>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.5rem" }}>
+                            <p style={{ fontSize: "0.875rem", color: "#e2e8f0" }}>{alert.message}</p>
                             <button
                               onClick={() => handleDismissAlert(origIndex)}
-                              className="ml-2 shrink-0 rounded-lg p-1 text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+                              style={{
+                                marginLeft: "0.5rem",
+                                flexShrink: 0,
+                                borderRadius: "0.5rem",
+                                padding: "0.25rem",
+                                color: "var(--text-secondary)",
+                                transition: "colors 0.2s",
+                                backgroundColor: "transparent",
+                                border: "none",
+                                cursor: "pointer"
+                              }}
                               title="Dismiss"
                             >
-                              <HiOutlineXMark className="h-4 w-4" />
+                              <HiOutlineXMark style={{ height: "1rem", width: "1rem" }} />
                             </button>
                           </div>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
                             <StatusBadge
                               status={severityMap(alert.severity)}
                               label={alert.severity || 'Info'}
                             />
                             {alert.houseId && (
-                              <span className="text-xs text-slate-500">
+                              <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                                 House #{alert.houseId}
                               </span>
                             )}
                             {alert.createdAt && (
-                              <span className="text-xs text-slate-500">
+                              <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                                 {new Date(alert.createdAt).toLocaleString()}
                               </span>
                             )}

@@ -3,23 +3,17 @@ import { HiCheck } from "react-icons/hi";
 
 export default function StepIndicator({ steps = [], currentStep = 0 }) {
   return (
-    <div className="flex items-center justify-center w-full max-w-lg mx-auto">
+    <div className="step-container">
       {steps.map((label, index) => {
         const isCompleted = index < currentStep;
         const isActive = index === currentStep;
 
         return (
-          <div key={index} className="flex items-center flex-1 last:flex-none">
+          <div key={index} className="step-wrapper">
             {/* Step circle + label */}
-            <div className="flex flex-col items-center relative">
+            <div className="step-circle-container">
               <motion.div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-colors duration-300 ${
-                  isCompleted
-                    ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                    : isActive
-                    ? "border-[var(--accent)] bg-[var(--accent)]/20 text-[var(--accent)]"
-                    : "border-white/20 bg-white/5 text-[var(--text-secondary)]"
-                }`}
+                className={`step-circle ${isCompleted ? "completed" : isActive ? "active" : "pending"}`}
                 initial={false}
                 animate={{
                   scale: isActive ? 1.1 : 1,
@@ -35,28 +29,22 @@ export default function StepIndicator({ steps = [], currentStep = 0 }) {
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 400, damping: 15 }}
                   >
-                    <HiCheck className="w-5 h-5" />
+                    <HiCheck style={{ width: "1.25rem", height: "1.25rem" }} />
                   </motion.div>
                 ) : (
                   index + 1
                 )}
               </motion.div>
-              <span
-                className={`absolute -bottom-6 text-xs whitespace-nowrap font-medium transition-colors duration-300 ${
-                  isActive || isCompleted
-                    ? "text-[var(--text-primary)]"
-                    : "text-[var(--text-secondary)]"
-                }`}
-              >
+              <span className={`step-label ${isActive || isCompleted ? "active" : "pending"}`}>
                 {label}
               </span>
             </div>
 
             {/* Connector line */}
             {index < steps.length - 1 && (
-              <div className="flex-1 h-[2px] mx-3 bg-white/10 rounded-full overflow-hidden">
+              <div className="step-connector-wrapper">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)]"
+                  style={{ height: "100%", background: "linear-gradient(to right, var(--accent), var(--accent-secondary))" }}
                   initial={{ width: "0%" }}
                   animate={{ width: isCompleted ? "100%" : "0%" }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}

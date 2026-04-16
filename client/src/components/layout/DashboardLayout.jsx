@@ -13,11 +13,25 @@ export default function DashboardLayout({ role = "user" }) {
   const location = useLocation();
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg-primary)]">
+    <div className="layout-root">
+      {/* Global Dashboard Dynamic Mesh Background */}
+      <div className="layout-bg-mesh">
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="layout-bg-orb-1" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="layout-bg-orb-2" 
+        />
+      </div>
+
       <Sidebar role={role} />
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <div className="layout-content-wrapper">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="layout-main">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

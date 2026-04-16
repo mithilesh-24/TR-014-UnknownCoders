@@ -1,18 +1,16 @@
 import { motion } from "framer-motion";
 
 export default function GlassCard({ children, className = "", hover = false, ...props }) {
-  const baseClasses =
-    "backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl shadow-lg";
-
   if (hover) {
     return (
       <motion.div
-        className={`${baseClasses} ${className}`}
+        className={`glass-card ${className}`.trim()}
         whileHover={{
-          scale: 1.02,
-          boxShadow: "0 0 25px rgba(99, 102, 241, 0.2), 0 0 50px rgba(139, 92, 246, 0.1)",
+          y: -4,
+          scale: 1.01,
+          boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.08)",
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
         {...props}
       >
         {children}
@@ -21,7 +19,7 @@ export default function GlassCard({ children, className = "", hover = false, ...
   }
 
   return (
-    <div className={`${baseClasses} ${className}`} {...props}>
+    <div className={`glass-card ${className}`.trim()} {...props}>
       {children}
     </div>
   );

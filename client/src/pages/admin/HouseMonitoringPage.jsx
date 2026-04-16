@@ -46,18 +46,18 @@ const periods = ['day', 'week', 'month'];
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6">
-      <div className="mb-8 h-10 w-72 animate-pulse rounded-xl bg-white/5" />
-      <div className="mb-6 flex gap-4">
-        <div className="h-10 w-64 animate-pulse rounded-xl bg-white/5" />
-        <div className="h-10 w-48 animate-pulse rounded-xl bg-white/5" />
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" style={{ width: "18rem", marginBottom: "2rem" }} />
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
+        <div className="skeleton-pulse skeleton-title" style={{ width: "16rem", height: "2.5rem" }} />
+        <div className="skeleton-pulse skeleton-title" style={{ width: "12rem", height: "2.5rem" }} />
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-52 animate-pulse rounded-2xl border border-white/[0.06] bg-[#1a1a2e]/60"
-            style={{ animationDelay: `${i * 80}ms` }}
+            className="skeleton-pulse skeleton-chart-full"
+            style={{ height: "13rem", animationDelay: `${i * 80}ms` }}
           />
         ))}
       </div>
@@ -106,7 +106,7 @@ function HouseDetailModal({ house, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}
         variants={overlayVariants}
         initial="hidden"
         animate="visible"
@@ -114,7 +114,7 @@ function HouseDetailModal({ house, onClose }) {
       >
         {/* Backdrop */}
         <motion.div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -123,7 +123,7 @@ function HouseDetailModal({ house, onClose }) {
 
         {/* Modal */}
         <motion.div
-          className="relative z-10 w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl border border-white/[0.08] bg-[#1a1a2e]/95 backdrop-blur-xl shadow-2xl shadow-black/40"
+          style={{ position: "relative", zIndex: 10, width: "100%", maxWidth: "48rem", maxHeight: "85vh", overflowY: "auto", borderRadius: "1rem", border: "1px solid rgba(255,255,255,0.08)", backgroundColor: "rgba(26, 26, 46, 0.95)", backdropFilter: "blur(16px)", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.4)" }}
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -132,26 +132,26 @@ function HouseDetailModal({ house, onClose }) {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
+            style={{ position: "absolute", right: "1rem", top: "1rem", zIndex: 10, display: "flex", height: "2rem", width: "2rem", alignItems: "center", justifyContent: "center", borderRadius: "0.5rem", backgroundColor: "rgba(255,255,255,0.05)", color: "var(--text-secondary)", transition: "colors 0.2s", border: "none", cursor: "pointer" }}
           >
-            <HiOutlineXMark className="h-5 w-5" />
+            <HiOutlineXMark style={{ height: "1.25rem", width: "1.25rem" }} />
           </button>
 
-          <div className="p-6">
+          <div style={{ padding: "1.5rem" }}>
             {/* House Details Header */}
-            <div className="mb-6 flex items-start gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-500/10">
-                <HiOutlineHome className="h-7 w-7 text-indigo-400" />
+            <div style={{ marginBottom: "1.5rem", display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+              <div style={{ display: "flex", height: "3.5rem", width: "3.5rem", alignItems: "center", justifyContent: "center", borderRadius: "0.75rem", backgroundColor: "rgba(99, 102, 241, 0.1)" }}>
+                <HiOutlineHome style={{ height: "1.75rem", width: "1.75rem", color: "#818cf8" }} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-100">
+                <h2 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#f1f5f9" }}>
                   House #{house.houseNumber}
                 </h2>
-                <p className="text-sm text-slate-400">{house.address}</p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
+                <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>{house.address}</p>
+                <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
                   {house.user && (
-                    <span className="flex items-center gap-1 text-xs text-slate-400">
-                      <HiOutlineUser className="h-3.5 w-3.5" />
+                    <span style={{ display: "flex", alignItems: "center", gap: "0.25rem", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                      <HiOutlineUser style={{ height: "0.875rem", width: "0.875rem" }} />
                       {house.user.name}
                     </span>
                   )}
@@ -170,20 +170,20 @@ function HouseDetailModal({ house, onClose }) {
             </div>
 
             {/* Stats Row */}
-            <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] p-4">
-                <p className="text-xs text-slate-500">Residents</p>
-                <p className="mt-1 text-lg font-semibold text-slate-200">{house.residents ?? '-'}</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
+              <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.04)", padding: "1rem" }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Residents</p>
+                <p style={{ marginTop: "0.25rem", fontSize: "1.125rem", fontWeight: "600", color: "#e2e8f0" }}>{house.residents ?? '-'}</p>
               </div>
-              <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] p-4">
-                <p className="text-xs text-slate-500">Latest Consumption</p>
-                <p className="mt-1 text-lg font-semibold text-slate-200">
+              <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.04)", padding: "1rem" }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Latest Consumption</p>
+                <p style={{ marginTop: "0.25rem", fontSize: "1.125rem", fontWeight: "600", color: "#e2e8f0" }}>
                   {house.latestConsumption != null ? `${house.latestConsumption} kWh` : '-'}
                 </p>
               </div>
-              <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] p-4">
-                <p className="text-xs text-slate-500">Total Consumption</p>
-                <p className="mt-1 text-lg font-semibold text-slate-200">
+              <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.04)", padding: "1rem" }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Total Consumption</p>
+                <p style={{ marginTop: "0.25rem", fontSize: "1.125rem", fontWeight: "600", color: "#e2e8f0" }}>
                   {house.totalConsumption != null ? `${Math.round(house.totalConsumption)} kWh` : '-'}
                 </p>
               </div>
@@ -191,18 +191,18 @@ function HouseDetailModal({ house, onClose }) {
 
             {/* Charts */}
             {loadingDetail ? (
-              <div className="space-y-4">
-                <div className="h-56 animate-pulse rounded-xl bg-white/[0.03]" />
-                <div className="h-56 animate-pulse rounded-xl bg-white/[0.03]" />
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div className="skeleton-pulse skeleton-chart-full" style={{ height: "14rem" }} />
+                <div className="skeleton-pulse skeleton-chart-full" style={{ height: "14rem" }} />
               </div>
             ) : (
-              <div className="space-y-6">
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
                 {consumptionData.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-slate-300">
+                    <h4 style={{ marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: "500", color: "#cbd5e1" }}>
                       Consumption History
                     </h4>
-                    <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3">
+                    <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "0.75rem" }}>
                       <AnimatedAreaChart
                         data={consumptionData}
                         areas={consumptionAreas}
@@ -214,10 +214,10 @@ function HouseDetailModal({ house, onClose }) {
                 )}
                 {distributionData.length > 0 && (
                   <div>
-                    <h4 className="mb-3 text-sm font-medium text-slate-300">
+                    <h4 style={{ marginBottom: "0.75rem", fontSize: "0.875rem", fontWeight: "500", color: "#cbd5e1" }}>
                       Distribution History
                     </h4>
-                    <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3">
+                    <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "0.75rem" }}>
                       <AnimatedAreaChart
                         data={distributionData}
                         areas={distributionAreas}
@@ -228,8 +228,8 @@ function HouseDetailModal({ house, onClose }) {
                   </div>
                 )}
                 {consumptionData.length === 0 && distributionData.length === 0 && (
-                  <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-8 text-center">
-                    <p className="text-sm text-slate-500">No historical data available</p>
+                  <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)", padding: "2rem", textAlign: "center" }}>
+                    <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>No historical data available</p>
                   </div>
                 )}
               </div>
@@ -280,94 +280,114 @@ export default function HouseMonitoringPage() {
   if (loading && houses.length === 0) return <LoadingSkeleton />;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 sm:p-6 lg:p-8">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="mx-auto max-w-7xl"
-      >
+    <div className="page-container">
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="page-inner-xl">
         {/* Header */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-100">House Monitoring</h1>
-          <p className="mt-1 text-sm text-slate-400">
+        <motion.div variants={itemVariants} style={{ marginBottom: "2rem" }}>
+          <h1 className="page-title">House Monitoring</h1>
+          <p className="page-subtitle" style={{ marginTop: "0.25rem" }}>
             Monitor and manage all connected households
           </p>
         </motion.div>
 
         {/* Filter Bar */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-center gap-3">
+        <motion.div variants={itemVariants} style={{ marginBottom: "1.5rem", display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "center", justifyItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             {/* Period Tabs */}
-            <div className="flex rounded-xl bg-white/[0.04] border border-white/[0.06] p-1">
+            <div style={{ display: "flex", borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", padding: "0.25rem" }}>
               {periods.map((p) => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
-                  className={`relative rounded-lg px-4 py-1.5 text-xs font-medium capitalize transition-colors ${
-                    period === p
-                      ? 'text-white'
-                      : 'text-slate-400 hover:text-slate-300'
-                  }`}
+                  style={{
+                    position: "relative",
+                    borderRadius: "0.5rem",
+                    padding: "0.375rem 1rem",
+                    fontSize: "0.75rem",
+                    fontWeight: "500",
+                    textTransform: "capitalize",
+                    transition: "colors 0.2s",
+                    color: period === p ? "#fff" : "var(--text-secondary)",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
                 >
                   {period === p && (
                     <motion.div
                       layoutId="period-tab"
-                      className="absolute inset-0 rounded-lg bg-indigo-500/20 border border-indigo-500/30"
+                      style={{ position: "absolute", inset: 0, borderRadius: "0.5rem", backgroundColor: "rgba(99, 102, 241, 0.2)", border: "1px solid rgba(99, 102, 241, 0.3)" }}
                       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                     />
                   )}
-                  <span className="relative z-10">{p}</span>
+                  <span style={{ position: "relative", zIndex: 10 }}>{p}</span>
                 </button>
               ))}
             </div>
 
             {/* View Toggle */}
-            <div className="flex rounded-xl bg-white/[0.04] border border-white/[0.06] p-1">
+            <div style={{ display: "flex", borderRadius: "0.75rem", backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", padding: "0.25rem" }}>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`rounded-lg p-1.5 transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-indigo-500/20 text-indigo-400'
-                    : 'text-slate-400 hover:text-slate-300'
-                }`}
+                style={{
+                  borderRadius: "0.5rem",
+                  padding: "0.375rem",
+                  transition: "colors 0.2s",
+                  backgroundColor: viewMode === 'grid' ? "rgba(99, 102, 241, 0.2)" : "transparent",
+                  color: viewMode === 'grid' ? "#818cf8" : "var(--text-secondary)",
+                  border: "none",
+                  cursor: "pointer"
+                }}
               >
-                <HiOutlineSquares2X2 className="h-4 w-4" />
+                <HiOutlineSquares2X2 style={{ height: "1rem", width: "1rem" }} />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`rounded-lg p-1.5 transition-colors ${
-                  viewMode === 'table'
-                    ? 'bg-indigo-500/20 text-indigo-400'
-                    : 'text-slate-400 hover:text-slate-300'
-                }`}
+                style={{
+                  borderRadius: "0.5rem",
+                  padding: "0.375rem",
+                  transition: "colors 0.2s",
+                  backgroundColor: viewMode === 'table' ? "rgba(99, 102, 241, 0.2)" : "transparent",
+                  color: viewMode === 'table' ? "#818cf8" : "var(--text-secondary)",
+                  border: "none",
+                  cursor: "pointer"
+                }}
               >
-                <HiOutlineTableCells className="h-4 w-4" />
+                <HiOutlineTableCells style={{ height: "1rem", width: "1rem" }} />
               </button>
             </div>
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <div style={{ position: "relative", width: "100%", maxWidth: "16rem" }}>
+            <HiOutlineMagnifyingGlass style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", height: "1rem", width: "1rem", color: "var(--text-secondary)" }} />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by house # or name..."
-              className="w-full rounded-xl border border-white/[0.06] bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500/30 focus:bg-white/[0.06] sm:w-64"
+              style={{
+                width: "100%",
+                borderRadius: "0.75rem",
+                border: "1px solid rgba(255,255,255,0.06)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                padding: "0.5rem 1rem 0.5rem 2.25rem",
+                fontSize: "0.875rem",
+                color: "#e2e8f0",
+                outline: "none",
+                transition: "all 0.2s"
+              }}
+              onFocus={(e) => { e.target.style.borderColor = "rgba(99, 102, 241, 0.3)"; e.target.style.backgroundColor = "rgba(255,255,255,0.06)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.06)"; e.target.style.backgroundColor = "rgba(255,255,255,0.04)"; }}
             />
           </div>
         </motion.div>
 
         {/* Error */}
         {error && (
-          <motion.div variants={itemVariants} className="mb-6">
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
-              <p className="text-sm text-red-300">{error}</p>
+          <motion.div variants={itemVariants} style={{ marginBottom: "1.5rem" }}>
+            <div style={{ borderRadius: "0.75rem", backgroundColor: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "1rem" }}>
+              <p style={{ fontSize: "0.875rem", color: "#fca5a5" }}>{error}</p>
             </div>
           </motion.div>
         )}
@@ -378,26 +398,27 @@ export default function HouseMonitoringPage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
+            className="grid-metrics"
+            style={{ marginTop: "1.5rem" }}
           >
             {filteredHouses.map((house) => (
-              <motion.div key={house._id} variants={itemVariants}>
+              <motion.div key={house._id} variants={itemVariants} style={{ height: "100%", display: "flex", flexDirection: "column" }}>
                 <GlassCard
                   hover
                   onClick={() => setSelectedHouse(house)}
-                  className="p-5"
+                  style={{ padding: "1.25rem", height: "100%", cursor: "pointer", display: "flex", flexDirection: "column" }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10">
-                        <HiOutlineHome className="h-5 w-5 text-indigo-400" />
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1rem" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                      <div style={{ display: "flex", height: "2.75rem", width: "2.75rem", alignItems: "center", justifyContent: "center", borderRadius: "0.75rem", backgroundColor: "rgba(99, 102, 241, 0.1)" }}>
+                        <HiOutlineHome style={{ height: "1.25rem", width: "1.25rem", color: "#818cf8" }} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-200">
+                        <h3 style={{ fontWeight: "600", color: "#e2e8f0" }}>
                           House #{house.houseNumber}
                         </h3>
                         {house.user && (
-                          <p className="text-xs text-slate-500">{house.user.name}</p>
+                          <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>{house.user.name}</p>
                         )}
                       </div>
                     </div>
@@ -407,46 +428,46 @@ export default function HouseMonitoringPage() {
                     />
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div className="rounded-lg bg-white/[0.03] p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                  <div style={{ marginTop: "1rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", flexGrow: 1 }}>
+                    <div style={{ borderRadius: "0.5rem", backgroundColor: "rgba(255,255,255,0.03)", padding: "0.75rem" }}>
+                      <p style={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Consumption
                       </p>
-                      <div className="mt-0.5">
+                      <div style={{ marginTop: "0.125rem" }}>
                         <AnimatedCounter
                           value={house.latestConsumption ?? 0}
                           suffix=" kWh"
-                          className="text-sm font-semibold text-slate-200"
+                          className="font-semibold"
+                          style={{ fontSize: "0.875rem", color: "#e2e8f0" }}
                         />
                       </div>
                     </div>
-                    {house.hasSolar && (
-                      <div className="rounded-lg bg-white/[0.03] p-3">
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                    {house.hasSolar ? (
+                      <div style={{ borderRadius: "0.5rem", backgroundColor: "rgba(255,255,255,0.03)", padding: "0.75rem" }}>
+                        <p style={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                           Solar Cap.
                         </p>
-                        <div className="mt-0.5 flex items-center gap-1">
-                          <RiSunLine className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-sm font-semibold text-slate-200">
+                        <div style={{ marginTop: "0.125rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                          <RiSunLine style={{ height: "0.875rem", width: "0.875rem", color: "#fbbf24" }} />
+                          <span style={{ fontSize: "0.875rem", fontWeight: "600", color: "#e2e8f0" }}>
                             {house.solarCapacity ?? 0} kW
                           </span>
                         </div>
                       </div>
-                    )}
-                    {!house.hasSolar && (
-                      <div className="rounded-lg bg-white/[0.03] p-3">
-                        <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                    ) : (
+                      <div style={{ borderRadius: "0.5rem", backgroundColor: "rgba(255,255,255,0.03)", padding: "0.75rem" }}>
+                        <p style={{ fontSize: "0.625rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                           Solar Cap.
                         </p>
-                        <p className="mt-0.5 text-sm text-slate-500">N/A</p>
+                        <p style={{ marginTop: "0.125rem", fontSize: "0.875rem", color: "var(--text-secondary)" }}>N/A</p>
                       </div>
                     )}
                   </div>
 
                   {house.cutCount > 0 && (
-                    <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-500/5 border border-red-500/10 px-3 py-2">
-                      <HiOutlineExclamationTriangle className="h-3.5 w-3.5 text-red-400" />
-                      <span className="text-xs text-red-300">
+                    <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.5rem", borderRadius: "0.5rem", backgroundColor: "rgba(239, 68, 68, 0.05)", border: "1px solid rgba(239, 68, 68, 0.1)", padding: "0.5rem 0.75rem" }}>
+                      <HiOutlineExclamationTriangle style={{ height: "0.875rem", width: "0.875rem", color: "#f87171" }} />
+                      <span style={{ fontSize: "0.75rem", color: "#fca5a5" }}>
                         {house.cutCount} power cut{house.cutCount !== 1 && 's'}
                       </span>
                     </div>
@@ -459,28 +480,28 @@ export default function HouseMonitoringPage() {
 
         {/* Table View */}
         {viewMode === 'table' && (
-          <motion.div variants={itemVariants}>
-            <GlassCard hover={false} className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-white/[0.06]">
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+          <motion.div variants={itemVariants} style={{ marginTop: "1rem" }}>
+            <GlassCard hover={false} style={{ overflow: "hidden" }}>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", textAlign: "left", fontSize: "0.875rem", borderCollapse: "collapse" }}>
+                  <thead style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <tr>
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         House
                       </th>
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Owner
                       </th>
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Consumption
                       </th>
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Solar
                       </th>
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Cuts
                       </th>
-                      <th className="px-5 py-3.5 text-xs font-medium uppercase tracking-wider text-slate-500">
+                      <th style={{ padding: "0.875rem 1.25rem", fontSize: "0.75rem", fontWeight: "500", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                         Total
                       </th>
                     </tr>
@@ -493,20 +514,22 @@ export default function HouseMonitoringPage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.03 }}
                         onClick={() => setSelectedHouse(house)}
-                        className="cursor-pointer border-b border-white/[0.03] transition-colors hover:bg-white/[0.03]"
+                        style={{ cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.03)", transition: "background-color 0.2s" }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.03)"}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                       >
-                        <td className="px-5 py-3 font-medium text-slate-200">
+                        <td style={{ padding: "0.75rem 1.25rem", fontWeight: "500", color: "#e2e8f0" }}>
                           #{house.houseNumber}
                         </td>
-                        <td className="px-5 py-3 text-slate-400">
+                        <td style={{ padding: "0.75rem 1.25rem", color: "var(--text-secondary)" }}>
                           {house.user?.name ?? '-'}
                         </td>
-                        <td className="px-5 py-3 text-slate-300">
+                        <td style={{ padding: "0.75rem 1.25rem", color: "#cbd5e1" }}>
                           {house.latestConsumption != null
                             ? `${house.latestConsumption} kWh`
                             : '-'}
                         </td>
-                        <td className="px-5 py-3">
+                        <td style={{ padding: "0.75rem 1.25rem" }}>
                           <StatusBadge
                             status={house.hasSolar ? 'ok' : 'warning'}
                             label={
@@ -516,16 +539,16 @@ export default function HouseMonitoringPage() {
                             }
                           />
                         </td>
-                        <td className="px-5 py-3">
+                        <td style={{ padding: "0.75rem 1.25rem" }}>
                           {house.cutCount > 0 ? (
-                            <span className="font-medium text-red-400">
+                            <span style={{ fontWeight: "500", color: "#f87171" }}>
                               {house.cutCount}
                             </span>
                           ) : (
-                            <span className="text-slate-500">0</span>
+                            <span style={{ color: "var(--text-secondary)" }}>0</span>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-slate-400">
+                        <td style={{ padding: "0.75rem 1.25rem", color: "var(--text-secondary)" }}>
                           {house.totalConsumption != null
                             ? `${Math.round(house.totalConsumption)} kWh`
                             : '-'}
@@ -536,8 +559,8 @@ export default function HouseMonitoringPage() {
                 </table>
               </div>
               {filteredHouses.length === 0 && (
-                <div className="p-8 text-center">
-                  <p className="text-sm text-slate-500">
+                <div style={{ padding: "2rem", textAlign: "center" }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
                     {search ? 'No houses match your search' : 'No houses found'}
                   </p>
                 </div>
@@ -548,9 +571,9 @@ export default function HouseMonitoringPage() {
 
         {/* Empty state for grid */}
         {viewMode === 'grid' && filteredHouses.length === 0 && (
-          <motion.div variants={itemVariants} className="mt-8 text-center">
-            <HiOutlineHome className="mx-auto h-12 w-12 text-slate-600" />
-            <p className="mt-3 text-sm text-slate-500">
+          <motion.div variants={itemVariants} style={{ marginTop: "2rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <HiOutlineHome style={{ height: "3rem", width: "3rem", color: "var(--text-secondary)", marginBottom: "0.75rem" }} />
+            <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
               {search ? 'No houses match your search' : 'No houses found'}
             </p>
           </motion.div>

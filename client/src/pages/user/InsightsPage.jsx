@@ -30,19 +30,17 @@ const item = {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 animate-pulse">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="h-10 w-52 bg-white/5 rounded-xl" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-48 bg-white/5 rounded-2xl" />
-          <div className="h-48 bg-white/5 rounded-2xl" />
-        </div>
-        <div className="h-80 bg-white/5 rounded-2xl" />
-        <div className="h-24 bg-white/5 rounded-2xl" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-28 bg-white/5 rounded-2xl" />
-          <div className="h-28 bg-white/5 rounded-2xl" />
-        </div>
+    <div className="page-container">
+      <div className="skeleton-pulse skeleton-title" />
+      <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "12rem" }} />
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "12rem" }} />
+      </div>
+      <div className="skeleton-pulse skeleton-chart-full" style={{ height: "20rem" }} />
+      <div className="skeleton-pulse skeleton-title" style={{ width: "12rem" }} />
+      <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "8rem" }} />
+        <div className="skeleton-pulse skeleton-chart-full" style={{ height: "8rem" }} />
       </div>
     </div>
   );
@@ -86,11 +84,11 @@ export default function InsightsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-6">
-        <GlassCard className="p-8 text-center max-w-md">
-          <HiChartBar className="text-red-400 text-4xl mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Failed to load insights</h2>
-          <p className="text-slate-400 text-sm">{error}</p>
+      <div className="page-container flex-col-center h-full">
+        <GlassCard className="p-6 text-center" style={{ maxWidth: '28rem' }}>
+          <HiChartBar style={{ fontSize: "2.25rem", color: "#f87171", margin: '0 auto 1rem' }} />
+          <h2 className="page-title mb-2">Failed to load insights</h2>
+          <p className="page-subtitle">{error}</p>
         </GlassCard>
       </div>
     );
@@ -134,102 +132,91 @@ export default function InsightsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-4 md:p-6 lg:p-8">
-      <motion.div
-        className="max-w-6xl mx-auto space-y-6"
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
+    <div className="page-container">
+      <motion.div className="page-inner-md" variants={container} initial="hidden" animate="show">
         {/* Header */}
-        <motion.div variants={item} className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
-            <RiFlashlightLine className="text-purple-400 text-xl" />
+        <motion.div variants={item} style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.5rem" }}>
+          <div style={{ padding: "0.625rem", borderRadius: "0.75rem", backgroundColor: "rgba(168, 85, 247, 0.1)", border: "1px solid rgba(168, 85, 247, 0.2)" }}>
+            <RiFlashlightLine style={{ fontSize: "1.25rem", color: "#c084fc" }} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Usage Insights</h1>
-            <p className="text-slate-400 text-sm">Analyze your energy consumption patterns</p>
+            <h1 className="page-title">Usage Insights</h1>
+            <p className="page-subtitle">Analyze your energy consumption patterns</p>
           </div>
         </motion.div>
 
         {/* Comparison Cards Row */}
-        <motion.div variants={item} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <motion.div variants={item} className="grid-metrics mt-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
           {/* Today vs Yesterday Card */}
-          <GlassCard className="p-5 md:p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <HiChartBar className="text-indigo-400" />
+          <GlassCard className="metric-card">
+            <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiChartBar style={{ color: "#818cf8" }} />
               Today vs Yesterday
             </h3>
 
-            <div className="flex items-center gap-6 mb-4">
+            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "1rem" }}>
               {/* Today */}
-              <div className="flex-1">
-                <p className="text-slate-400 text-xs mb-1">Today</p>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem" }}>Today</p>
                 <AnimatedCounter
                   value={todayTotal}
                   suffix=" kWh"
-                  className="text-2xl font-bold text-white"
+                  style={{ fontSize: "1.5rem", fontWeight: "700", color: "var(--text-primary)" }}
                   duration={1}
                 />
               </div>
 
               {/* Arrow / change indicator */}
-              <div className="flex flex-col items-center">
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <motion.div
-                  className={`p-2 rounded-full ${
-                    isReduced ? "bg-emerald-500/10" : "bg-red-500/10"
-                  }`}
+                  style={{ padding: "0.5rem", borderRadius: "50%", backgroundColor: isReduced ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)" }}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.3, type: "spring" }}
                 >
                   {isReduced ? (
-                    <HiArrowTrendingDown className="text-emerald-400 text-lg" />
+                    <HiArrowTrendingDown style={{ fontSize: "1.125rem", color: "#34d399" }} />
                   ) : (
-                    <HiArrowTrendingUp className="text-red-400 text-lg" />
+                    <HiArrowTrendingUp style={{ fontSize: "1.125rem", color: "#f87171" }} />
                   )}
                 </motion.div>
                 <span
-                  className={`text-xs font-bold mt-1 ${
-                    isReduced ? "text-emerald-400" : "text-red-400"
-                  }`}
+                  style={{ fontSize: "0.75rem", fontWeight: "700", marginTop: "0.25rem", color: isReduced ? "#34d399" : "#f87171" }}
                 >
                   {changeAbs.toFixed(1)}%
                 </span>
               </div>
 
               {/* Yesterday */}
-              <div className="flex-1 text-right">
-                <p className="text-slate-400 text-xs mb-1">Yesterday</p>
+              <div style={{ flex: 1, textAlign: "right" }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem" }}>Yesterday</p>
                 <AnimatedCounter
                   value={yesterdayTotal}
                   suffix=" kWh"
-                  className="text-2xl font-bold text-white"
+                  style={{ fontSize: "1.5rem", fontWeight: "700", color: "var(--text-primary)" }}
                   duration={1}
                 />
               </div>
             </div>
 
             {/* Small comparison bars */}
-            <div className="space-y-2">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {comparisonData.map((entry) => {
                 const maxVal = Math.max(todayTotal, yesterdayTotal, 1);
                 const pct = (entry.value / maxVal) * 100;
                 const isToday = entry.label === "Today";
                 return (
-                  <div key={entry.label} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400 w-16">{entry.label}</span>
-                    <div className="flex-1 h-2.5 bg-white/5 rounded-full overflow-hidden">
+                  <div key={entry.label} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", width: "4rem" }}>{entry.label}</span>
+                    <div style={{ flex: 1, height: "0.625rem", backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "9999px", overflow: "hidden" }}>
                       <motion.div
-                        className={`h-full rounded-full ${
-                          isToday ? "bg-indigo-500" : "bg-purple-500/60"
-                        }`}
+                        style={{ height: "100%", borderRadius: "9999px", backgroundColor: isToday ? "#6366f1" : "rgba(168, 85, 247, 0.6)" }}
                         initial={{ width: "0%" }}
                         animate={{ width: `${pct}%` }}
                         transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                       />
                     </div>
-                    <span className="text-xs text-slate-400 w-14 text-right">
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", width: "3.5rem", textAlign: "right" }}>
                       {entry.value.toFixed(1)}
                     </span>
                   </div>
@@ -239,24 +226,24 @@ export default function InsightsPage() {
           </GlassCard>
 
           {/* This Week Card */}
-          <GlassCard className="p-5 md:p-6">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <HiCalendarDays className="text-purple-400" />
+          <GlassCard className="metric-card">
+            <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiCalendarDays style={{ color: "#c084fc" }} />
               This Week
             </h3>
 
-            <div className="flex items-center justify-between mb-4">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
               <div>
-                <p className="text-slate-400 text-xs mb-1">Avg. Daily</p>
-                <p className="text-2xl font-bold text-white">
-                  {weeklyAvg} <span className="text-sm text-slate-400">kWh</span>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem" }}>Avg. Daily</p>
+                <p style={{ fontSize: "1.5rem", fontWeight: "700", color: "var(--text-primary)" }}>
+                  {weeklyAvg} <span style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>kWh</span>
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-slate-400 text-xs mb-1">Total</p>
-                <p className="text-lg font-semibold text-slate-300">
+              <div style={{ textAlign: "right" }}>
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.25rem" }}>Total</p>
+                <p style={{ fontSize: "1.125rem", fontWeight: "600", color: "#cbd5e1" }}>
                   {weeklyData.reduce((s, d) => s + d.consumption, 0).toFixed(1)}{" "}
-                  <span className="text-xs text-slate-400">kWh</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>kWh</span>
                 </p>
               </div>
             </div>
@@ -280,7 +267,7 @@ export default function InsightsPage() {
                 showGrid={false}
               />
             ) : (
-              <div className="h-24 flex items-center justify-center text-slate-500 text-xs">
+              <div className="flex-col-center" style={{ height: "6rem", color: "var(--text-secondary)", fontSize: "0.75rem" }}>
                 No weekly data
               </div>
             )}
@@ -288,35 +275,37 @@ export default function InsightsPage() {
         </motion.div>
 
         {/* Weekly Bar Chart */}
-        <motion.div variants={item}>
-          <GlassCard className="p-5 md:p-6">
-            <div className="flex items-center justify-between mb-4">
+        <motion.div variants={item} className="mt-6">
+          <GlassCard className="chart-card">
+            <div className="chart-header">
               <div>
-                <h2 className="text-lg font-semibold text-white">Weekly Consumption</h2>
-                <p className="text-slate-400 text-xs mt-0.5">Daily energy usage breakdown</p>
+                <h2 className="chart-title">Weekly Consumption</h2>
+                <p className="chart-subtitle">Daily energy usage breakdown</p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span className="w-2.5 h-2.5 rounded-sm bg-indigo-500" />
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                <span style={{ width: "0.625rem", height: "0.625rem", borderRadius: "0.125rem", backgroundColor: "#6366f1" }} />
                 kWh per day
               </div>
             </div>
             {weeklyChartData.length > 0 ? (
-              <AnimatedBarChart
-                data={weeklyChartData}
-                bars={[
-                  {
-                    dataKey: "consumption",
-                    name: "Consumption",
-                    fill: "#6366f1",
-                    radius: [6, 6, 0, 0],
-                    maxBarSize: 50,
-                  },
-                ]}
-                xKey="day"
-                height={320}
-              />
+              <div className="chart-area">
+                <AnimatedBarChart
+                  data={weeklyChartData}
+                  bars={[
+                    {
+                      dataKey: "consumption",
+                      name: "Consumption",
+                      fill: "#6366f1",
+                      radius: [6, 6, 0, 0],
+                      maxBarSize: 50,
+                    },
+                  ]}
+                  xKey="day"
+                  height={320}
+                />
+              </div>
             ) : (
-              <div className="flex items-center justify-center h-64 text-slate-500 text-sm">
+              <div className="flex-col-center h-full chart-area" style={{ color: "var(--text-secondary)", fontSize: "0.875rem" }}>
                 No weekly data available
               </div>
             )}
@@ -324,24 +313,24 @@ export default function InsightsPage() {
         </motion.div>
 
         {/* Peak Usage Hour */}
-        <motion.div variants={item}>
-          <GlassCard hover className="p-5">
-            <div className="flex items-center gap-4">
+        <motion.div variants={item} className="mt-6">
+          <GlassCard hover className="metric-card">
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <motion.div
-                className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20"
+                style={{ padding: "0.75rem", borderRadius: "0.75rem", backgroundColor: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.2)" }}
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
-                <HiClock className="text-amber-400 text-2xl" />
+                <HiClock style={{ fontSize: "1.5rem", color: "#fbbf24" }} />
               </motion.div>
               <div>
-                <p className="text-slate-400 text-xs uppercase tracking-wider">Peak Usage Hour</p>
-                <p className="text-xl font-bold text-white mt-0.5">
+                <p className="metric-label" style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Peak Usage Hour</p>
+                <p style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--text-primary)", marginTop: "0.125rem" }}>
                   {peakHour !== undefined && peakHour !== null
                     ? formatHour(peakHour)
                     : "N/A"}
                 </p>
-                <p className="text-slate-400 text-xs mt-0.5">
+                <p style={{ fontSize: "0.75rem", color: "var(--text-secondary)", marginTop: "0.125rem" }}>
                   Your highest energy consumption period today
                 </p>
               </div>
@@ -351,12 +340,12 @@ export default function InsightsPage() {
 
         {/* Suggestions */}
         {suggestions.length > 0 && (
-          <motion.div variants={item}>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <HiLightBulb className="text-yellow-400" />
+          <motion.div variants={item} className="mt-6">
+            <h2 style={{ fontSize: "1.125rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <HiLightBulb style={{ color: "#facc15" }} />
               Smart Suggestions
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid-metrics" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
               {suggestions.map((suggestion, idx) => (
                 <motion.div
                   key={idx}
@@ -364,18 +353,18 @@ export default function InsightsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.6 + idx * 0.12 }}
                 >
-                  <div className="relative rounded-2xl overflow-hidden">
+                  <div style={{ position: "relative", borderRadius: "1rem", overflow: "hidden" }}>
                     {/* Gradient border effect */}
-                    <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-transparent pointer-events-none">
-                      <div className="w-full h-full rounded-2xl bg-[#0a0a0f]" />
+                    <div style={{ position: "absolute", inset: 0, borderRadius: "1rem", padding: "1px", background: "linear-gradient(to bottom right, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.2), transparent)", pointerEvents: "none" }}>
+                      <div style={{ width: "100%", height: "100%", borderRadius: "1rem", backgroundColor: "transparent" }} />
                     </div>
 
-                    <GlassCard className="relative p-4 md:p-5">
-                      <div className="flex items-start gap-3">
-                        <div className="p-1.5 rounded-lg bg-yellow-500/10 border border-yellow-500/15 flex-shrink-0 mt-0.5">
-                          <HiLightBulb className="text-yellow-400 text-sm" />
+                    <GlassCard style={{ position: "relative", padding: "1.25rem" }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+                        <div style={{ padding: "0.375rem", borderRadius: "0.5rem", backgroundColor: "rgba(234, 179, 8, 0.1)", border: "1px solid rgba(234, 179, 8, 0.15)", flexShrink: 0, marginTop: "0.125rem" }}>
+                          <HiLightBulb style={{ fontSize: "0.875rem", color: "#facc15" }} />
                         </div>
-                        <p className="text-slate-300 text-sm leading-relaxed">{suggestion}</p>
+                        <p style={{ color: "#cbd5e1", fontSize: "0.875rem", lineHeight: 1.6 }}>{suggestion}</p>
                       </div>
                     </GlassCard>
                   </div>
@@ -387,10 +376,10 @@ export default function InsightsPage() {
 
         {/* Empty suggestions state */}
         {suggestions.length === 0 && (
-          <motion.div variants={item}>
-            <GlassCard className="p-8 text-center">
-              <HiLightBulb className="text-slate-600 text-3xl mx-auto mb-3" />
-              <p className="text-slate-400 text-sm">
+          <motion.div variants={item} className="mt-6">
+            <GlassCard className="p-8 text-center" style={{ padding: "2rem" }}>
+              <HiLightBulb style={{ fontSize: "1.875rem", color: "#475569", margin: "0 auto 0.75rem" }} />
+              <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
                 No suggestions available yet. Keep using energy and we'll provide
                 personalized tips to optimize your consumption.
               </p>
