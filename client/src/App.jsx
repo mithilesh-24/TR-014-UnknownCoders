@@ -22,6 +22,7 @@ import InsightsPage from "./pages/user/InsightsPage";
 // Admin extra
 import FairnessPage from "./pages/admin/FairnessPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import QuantumDashboardPage from "./pages/admin/QuantumDashboardPage";
 
 function AppRoutes() {
   return (
@@ -56,6 +57,17 @@ function AppRoutes() {
           <Route path="3d-view" element={<EnergyVisualizationPage />} />
           <Route path="fairness" element={<FairnessPage />} />
           <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        <Route
+          path="/quantum-dashboard"
+          element={
+            <ProtectedRoute adminOnly>
+              <DashboardLayout role="admin" />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<QuantumDashboardPage />} />
         </Route>
 
         {/* User routes - protected */}
