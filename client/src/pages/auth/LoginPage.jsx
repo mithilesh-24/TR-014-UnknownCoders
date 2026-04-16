@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 import AuthCard from "../../components/ui/AuthCard";
 import InputField from "../../components/ui/InputField";
 import Button from "../../components/ui/Button";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or username
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +21,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const userData = await login(email, password);
+      const userData = await login(identifier, password);
       if (userData.role === "admin") {
         navigate("/admin");
       } else if (userData.onboarded) {
@@ -53,12 +53,12 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="auth-form">
         <InputField
-          id="login-email"
-          icon={HiOutlineMail}
-          placeholder="Email Address"
+          id="login-identifier"
+          icon={HiOutlineUser}
+          placeholder="Email Address or Username"
           type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
         />
         <InputField
           id="login-password"
