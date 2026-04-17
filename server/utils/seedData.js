@@ -42,6 +42,8 @@ async function seedHouses() {
       return;
     }
 
+    console.log("[Seed] Seeding sample houses...");
+
     const sampleHouses = [
       { name: "Rajesh Kumar", houseNumber: "H-101", address: "12 MG Road, Sector 5", residents: 4, hasSolar: true, solarCapacity: 3.5 },
       { name: "Priya Sharma", houseNumber: "H-102", address: "34 Nehru Nagar, Block A", residents: 3, hasSolar: false, solarCapacity: 0 },
