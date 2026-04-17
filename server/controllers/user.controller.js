@@ -240,7 +240,7 @@ exports.getInsights = async (req, res) => {
 
 exports.onboardHouse = async (req, res) => {
   try {
-    const { houseNumber, address, aadhaarNumber, ownerProof, residents, hasSolar, solarCapacity } = req.body;
+    const { houseNumber, address, aadhaarNumber, residents, hasSolar, solarCapacity } = req.body;
 
     if (!houseNumber || !address || !aadhaarNumber || !residents) {
       return res.status(400).json({ message: "houseNumber, address, aadhaarNumber, and residents are required" });
@@ -256,21 +256,26 @@ exports.onboardHouse = async (req, res) => {
       return res.status(400).json({ message: "This house number is already registered" });
     }
 
+    // Handle boolean and numeric parsing from FormData
+    const isSolar = hasSolar === "true" || hasSolar === true;
+    const residentCount = parseInt(residents, 10);
+    const capacity = parseFloat(solarCapacity) || 0;
+
     const house = await House.create({
       houseNumber,
       userId: req.user._id,
       address,
       aadhaarNumber,
-      ownerProof: ownerProof || "",
-      residents,
-      hasSolar: hasSolar || false,
-      solarCapacity: solarCapacity || 0,
+      ownerProof: req.file ? `/uploads/${req.file.filename}` : (req.body.ownerProof || ""),
+      residents: residentCount,
+      hasSolar: isSolar,
+      solarCapacity: capacity,
     });
 
     await User.findByIdAndUpdate(req.user._id, {
       onboarded: true,
-      hasSolar: hasSolar || false,
-      solarCapacity: solarCapacity || 0,
+      hasSolar: isSolar,
+      solarCapacity: capacity,
     });
 
     return res.status(201).json({
