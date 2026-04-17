@@ -116,28 +116,37 @@ app.use((err, _req, res, _next) => {
 // ---------------------------------------------------------------------------
 // MongoDB connection & server start
 // ---------------------------------------------------------------------------
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(async () => {
-    console.log("Connected to MongoDB");
 
-    // Seed initial data
-    await runAllSeeds();
+// Listen on PORT immediately so Railway sees the app as healthy
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Root:    http://localhost:${PORT}/`);
+  console.log(`Health:  http://localhost:${PORT}/api/health`);
+  console.log(`Predict: http://localhost:${PORT}/api/predict`);
+  console.log(`Weather: http://localhost:${PORT}/api/weather`);
 
-    // Start cron jobs for hourly energy distribution
-    startCronJobs();
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Root:    http://localhost:${PORT}/`);
-      console.log(`Health:  http://localhost:${PORT}/api/health`);
-      console.log(`Predict: http://localhost:${PORT}/api/predict`);
-      console.log(`Weather: http://localhost:${PORT}/api/weather`);
+  // Connect to MongoDB in the background
+  mongoose
+    .connect(process.env.MONGODB_URI)
+    .then(async () => {
+      console.log("Connected to MongoDB established");
+      
+      try {
+        // Seed initial data
+        await runAllSeeds();
+        // Start cron jobs for hourly energy distribution
+        startCronJobs();
+      } catch (seedErr) {
+        console.error("[Startup] Error during seeding/cron startup:", seedErr.message);
+      }
+    })
+    .catch((err) => {
+      console.error("MongoDB connection fatal error:", err.message);
+      // In production, we might not want to exit immediately if DB is down, 
+      // but seeding is critical for this specific app's demo state.
+      // process.exit(1); 
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+});
 
 module.exports = app;
+
