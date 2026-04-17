@@ -117,35 +117,53 @@ app.use((err, _req, res, _next) => {
 // MongoDB connection & server start
 // ---------------------------------------------------------------------------
 
-// Listen on PORT immediately so Railway sees the app as healthy
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Root:    http://localhost:${PORT}/`);
-  console.log(`Health:  http://localhost:${PORT}/api/health`);
-  console.log(`Predict: http://localhost:${PORT}/api/predict`);
-  console.log(`Weather: http://localhost:${PORT}/api/weather`);
+console.log("[Startup] Attempting to listen on port:", PORT);
 
-  // Connect to MongoDB in the background
+const server = app.listen(PORT, () => {
+  console.log(`[Startup] Server successfully bound to port ${PORT}`);
+  console.log(`[Startup] Base URL: http://localhost:${PORT}/`);
+  
+  if (!process.env.MONGODB_URI) {
+    console.error("[Startup] CRITICAL: MONGODB_URI is not defined in environment variables!");
+    return;
+  }
+
+  console.log("[Startup] Connecting to MongoDB...");
+  
   mongoose
     .connect(process.env.MONGODB_URI)
     .then(async () => {
-      console.log("Connected to MongoDB established");
+      console.log("[Startup] MongoDB connection established successfully.");
       
       try {
-        // Seed initial data
+        console.log("[Startup] Checking database state / seeding...");
         await runAllSeeds();
-        // Start cron jobs for hourly energy distribution
+        
+        console.log("[Startup] Starting background cron jobs...");
         startCronJobs();
-      } catch (seedErr) {
-        console.error("[Startup] Error during seeding/cron startup:", seedErr.message);
+        
+        console.log("[Startup] Full system initialization complete.");
+      } catch (initErr) {
+        console.error("[Startup] Error during post-connection initialization:", initErr.message);
+        // We don't exit(1) here to allow the server to keep responding (e.g., to health checks)
       }
     })
     .catch((err) => {
-      console.error("MongoDB connection fatal error:", err.message);
-      // In production, we might not want to exit immediately if DB is down, 
-      // but seeding is critical for this specific app's demo state.
-      // process.exit(1); 
+      console.error("[Startup] MongoDB connection failed:", err.message);
+      console.error("[Startup] Stack Trace:", err.stack);
     });
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('[Shutdown] SIGTERM received. Closing HTTP server...');
+  server.close(() => {
+    console.log('[Shutdown] HTTP server closed.');
+    mongoose.connection.close(false, () => {
+      console.log('[Shutdown] MongoDB connection closed.');
+      process.exit(0);
+    });
+  });
 });
 
 module.exports = app;
