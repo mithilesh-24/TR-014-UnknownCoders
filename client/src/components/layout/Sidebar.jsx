@@ -25,7 +25,6 @@ const adminNavItems = [
   { label: "Predictions", icon: HiOutlineTrendingUp, path: "/admin/predictions" },
   { label: "3D View", icon: HiOutlineCube, path: "/admin/3d-view" },
   { label: "Fairness & Alerts", icon: HiOutlineShieldCheck, path: "/admin/fairness" },
-  { label: "Quantum", icon: HiOutlineLightningBolt, path: "/quantum-dashboard" },
   { label: "Settings", icon: HiOutlineCog, path: "/admin/settings" },
 ];
 
