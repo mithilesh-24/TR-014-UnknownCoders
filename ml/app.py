@@ -76,6 +76,12 @@ def parse_request(data: dict) -> dict:
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────
+@app.route("/", methods=["GET"])
+def root():
+    """Root route — Railway health check & basic status."""
+    return jsonify({"status": "ok", "service": "Tensor ML Server"})
+
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({
@@ -124,6 +130,7 @@ def predict():
 
 # ── Entry point ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    port = int(os.environ.get("ML_PORT", 5001))
+    # Railway injects PORT; fallback to 5001 for local development
+    port = int(os.environ.get("PORT", os.environ.get("ML_PORT", 5001)))
     print(f"[ML Server] Starting on port {port}")
     app.run(host="0.0.0.0", port=port, debug=False)
